@@ -802,7 +802,7 @@ export default function ClientEditor() {
       setUploadBusy(null);
     }
   }
-  function smartWrap(t, a0, b0, marker) {
+  function smartWrap(t: string, a0: number, b0: number, marker: string) {
     // trim selection edges so markers hug text; toggle off if already wrapped
     let a = a0, b = b0;
     while (a < b && /\s/.test(t[a])) a++;
