@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, mode: "promoted" });
     }
     const site = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const { data: invited, error: invErr } = await service.auth.admin.inviteUserByEmail(email, { redirectTo: `${site}/auth/callback?next=/set-password` });
+    const { data: invited, error: invErr } = await service.auth.admin.inviteUserByEmail(email, { redirectTo: `${site}/set-password` });
     if (invErr) return NextResponse.json({ error: invErr.message }, { status: 500 });
     if (invited?.user?.id) {
       await service.from("profiles").update({ is_everest_admin: true }).eq("id", invited.user.id);
