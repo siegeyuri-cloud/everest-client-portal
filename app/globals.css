@@ -1,26 +1,65 @@
+/* Tailwind v4 entry. The @config line loads the Everest design tokens
+   (colors, fonts, shadows, animations) from tailwind.config.ts — verified
+   to compile every custom utility (bg-storm, shadow-login, font-condensed,
+   animate-fade-up, etc.) on Tailwind v4. */
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Everest brand fonts — converted to woff2, served from /public/fonts/. */
+@font-face {
+  font-family: "Arkibal Display";
+  src: url("/fonts/ArkibalDisplay-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Korolev Compressed";
+  src: url("/fonts/KorolevCompressed-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Korolev Compressed";
+  src: url("/fonts/KorolevCompressed-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("/fonts/Montserrat-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f0eeec; /* snow */
+  color: #3c4142; /* ink */
+  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Topographic / expedition texture — dark hero + footer surfaces. */
+.bg-topo {
+  background-color: #2d3132;
+  background-image: url("/assets/topo-dark.png");
+  background-size: 720px;
+  background-repeat: repeat;
+}
+.bg-topo-granite {
+  background-color: #000000;
+  background-image: url("/assets/topo-dark.png");
+  background-size: 720px;
+  background-repeat: repeat;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
