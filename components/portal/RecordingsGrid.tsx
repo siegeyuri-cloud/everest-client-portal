@@ -22,7 +22,7 @@ export default function RecordingsGrid({ recordings, teamPhoto, highlightNum }: 
       <div className="flex max-w-[1080px] flex-col gap-8">
         <SectionHeading
           eyebrow="The Library"
-          title="Recordings + transcripts"
+          title="Recordings"
           lead="Calls and readouts post here within a day."
         />
         <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-[22px]">
@@ -39,15 +39,21 @@ export default function RecordingsGrid({ recordings, teamPhoto, highlightNum }: 
               <div className="relative flex h-[170px] items-center justify-center bg-topo">
                 {rec.hasThumb && (
                   <img
-                    src={teamPhoto}
+                    src={(rec as any).thumb || teamPhoto}
                     alt="Session recording"
                     className="absolute inset-0 h-full w-full object-cover opacity-85"
                   />
                 )}
                 {rec.available ? (
-                  <div className="relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-2 border-gold bg-storm/85 transition-[transform,background] duration-[280ms] ease-climb hover:scale-110 hover:bg-storm/95">
+                  <a
+                    href={rec.url || undefined}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Watch recording"
+                    className="relative flex h-14 w-14 transform-gpu cursor-pointer items-center justify-center rounded-full border-2 border-gold bg-storm/85 transition-all duration-300 ease-out will-change-transform hover:scale-110 hover:bg-storm/95 hover:shadow-lg"
+                  >
                     <PlayTriangle />
-                  </div>
+                  </a>
                 ) : (
                   <div className="relative rounded border border-ondark-line px-3.5 py-1.5 font-condensed text-[12px] uppercase tracking-wide text-ondark-muted">
                     {rec.lockNote}
@@ -68,7 +74,7 @@ export default function RecordingsGrid({ recordings, teamPhoto, highlightNum }: 
                   <div className="flex gap-4 pt-1">
                     {rec.url && (
                       <a href={rec.url} target="_blank" rel="noreferrer" className="font-condensed text-[12px] font-bold uppercase tracking-label text-teal-deep">
-                        Watch \u2192
+                        Watch {"\u2192"}
                       </a>
                     )}
                     {rec.transcriptUrl && (
@@ -76,15 +82,6 @@ export default function RecordingsGrid({ recordings, teamPhoto, highlightNum }: 
                         Transcript →
                       </a>
                     )}
-                    {["Highlights"].map((l) => (
-                      <a
-                        key={l}
-                        href="#"
-                        className="font-condensed text-[12px] font-bold uppercase tracking-label text-teal-deep no-underline"
-                      >
-                        {l}
-                      </a>
-                    ))}
                   </div>
                 )}
               </div>

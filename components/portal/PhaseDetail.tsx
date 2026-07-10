@@ -12,20 +12,40 @@ export interface PhaseDetailProps {
 
 
 /** Tiny inline formatter: **bold**, *italic*, __underline__ — admin-authored, no HTML injection. */
-function renderInline(text: string): React.ReactNode[] {
+function everestInline(text: string, depth = 0): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
-  const re = /(\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*)/g;
+  const re = /(\*\*\*[^*\n]+\*\*\*|\*\*(?:[^*\n]|\*(?!\*))+?\*\*|__(?:[^_\n]|_(?!_))+?__|\*[^\s*][^*\n]*?\*)/g;
   let last = 0, m: RegExpExecArray | null, k = 0;
+  const rec = (t: string) => (depth < 3 ? everestInline(t, depth + 1) : [t]);
   while ((m = re.exec(text))) {
     if (m.index > last) parts.push(text.slice(last, m.index));
     const tok = m[0];
-    if (tok.startsWith("**")) parts.push(<strong key={k++} className="font-bold text-storm">{tok.slice(2, -2)}</strong>);
-    else if (tok.startsWith("__")) parts.push(<u key={k++}>{tok.slice(2, -2)}</u>);
-    else parts.push(<em key={k++}>{tok.slice(1, -1)}</em>);
+    if (tok.startsWith("***")) parts.push(<strong key={k++} className="font-bold text-storm"><em>{tok.slice(3, -3)}</em></strong>);
+    else if (tok.startsWith("**")) parts.push(<strong key={k++} className="font-bold text-storm">{rec(tok.slice(2, -2))}</strong>);
+    else if (tok.startsWith("__")) parts.push(<u key={k++}>{rec(tok.slice(2, -2))}</u>);
+    else parts.push(<em key={k++}>{rec(tok.slice(1, -1))}</em>);
     last = m.index + tok.length;
   }
   if (last < text.length) parts.push(text.slice(last));
   return parts;
+}
+
+function everestLine(ln: string, key: React.Key): React.ReactNode {
+  const bullet = ln.match(/^\s*(?:[-\u2022\*])\s+(.*)$/);
+  if (bullet) {
+    return (
+      <span key={key} className="flex gap-2 pl-1">
+        <span className="select-none text-gold">{"\u2022"}</span>
+        <span className="flex-1">{everestInline(bullet[1])}</span>
+      </span>
+    );
+  }
+  return <span key={key} className="block">{everestInline(ln)}</span>;
+}
+
+function renderInline(text: string): React.ReactNode[] {
+  // lines render individually so "- " and "* " bullets work everywhere
+  return text.split("\n").map((ln, i) => everestLine(ln, i));
 }
 
 export default function PhaseDetail({ phase }: PhaseDetailProps) {

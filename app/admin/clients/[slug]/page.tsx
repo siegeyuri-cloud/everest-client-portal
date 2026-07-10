@@ -70,6 +70,7 @@ type SessionRow = {
   thumbnail_url?: string | null;
   fathom_url?: string;
   transcript_url?: string;
+  photos?: string[] | null;
 };
 
 type LogisticRow = {
@@ -97,6 +98,34 @@ const btnGold =
   "rounded bg-gold px-5 py-2.5 font-condensed text-[13px] font-bold uppercase tracking-label text-storm transition-[background,transform] duration-200 ease-climb hover:bg-gold-deep active:translate-y-px disabled:opacity-60 transition-transform duration-150 active:scale-[0.97]";
 const btnGhost =
   "rounded border border-line px-3.5 py-2 font-condensed text-[11px] font-bold uppercase tracking-label text-storm transition-[background,border-color] duration-200 ease-climb hover:border-storm hover:bg-black/[0.04] transition-transform duration-150 active:scale-[0.97]";
+
+function recapPreview(text: string): React.ReactNode {
+  const inline = (t: string) => {
+    const out: React.ReactNode[] = [];
+    const re = /(\*\*\*[^*\n]+\*\*\*|\*\*(?:[^*\n]|\*(?!\*))+?\*\*|__(?:[^_\n]|_(?!_))+?__|\*[^\s*][^*\n]*?\*)/g;
+    let last = 0, m: RegExpExecArray | null, k = 0;
+    while ((m = re.exec(t))) {
+      if (m.index > last) out.push(t.slice(last, m.index));
+      const tok = m[0];
+      if (tok.startsWith("***")) out.push(<strong key={k++} className="font-bold text-storm"><em>{tok.slice(3, -3)}</em></strong>);
+      else if (tok.startsWith("**")) out.push(<strong key={k++} className="font-bold text-storm">{inline(tok.slice(2, -2))}</strong>);
+      else if (tok.startsWith("__")) out.push(<u key={k++}>{tok.slice(2, -2)}</u>);
+      else out.push(<em key={k++}>{tok.slice(1, -1)}</em>);
+      last = m.index + tok.length;
+    }
+    if (last < t.length) out.push(t.slice(last));
+    return out;
+  };
+  return text.split(/\n\s*\n/).map((para, i) => (
+    <span key={i} className={"block" + (i > 0 ? " mt-3" : "")}>
+      {para.split("\n").map((ln, j) => {
+        const b = ln.match(/^\s*(?:[-\u2022\*])\s+(.*)$/);
+        if (b) return (<span key={j} className="flex gap-2 pl-1"><span className="select-none text-gold">{"\u2022"}</span><span className="flex-1">{inline(b[1])}</span></span>);
+        return <span key={j} className="block">{inline(ln)}</span>;
+      })}
+    </span>
+  ));
+}
 
 export default function ClientEditor() {
   const { slug } = useParams<{ slug: string }>();
@@ -132,6 +161,8 @@ export default function ClientEditor() {
   const [dirtyNoteIds, setDirtyNoteIds] = React.useState<Set<string>>(new Set());
   const [justCreated, setJustCreated] = React.useState<string | null>(null);
   const [orderSaving, setOrderSaving] = React.useState(false);
+  const [uploadBusy, setUploadBusy] = React.useState<string | null>(null);
+  const recapRef = React.useRef<Record<string, HTMLTextAreaElement | null>>({});
   const [dragSessionId, setDragSessionId] = React.useState<string | null>(null);
   const [sessionOrderDirty, setSessionOrderDirty] = React.useState(false);
   const [sessionOrderSaving, setSessionOrderSaving] = React.useState(false);
@@ -276,7 +307,7 @@ export default function ClientEditor() {
     async (orgId: string) => {
       const { data } = await supabase
         .from("sessions")
-        .select("id, title, session_date, status, objective, recap, visibility, sort_order, recording_resource_id, thumbnail_url")
+        .select("id, title, session_date, status, objective, recap, visibility, sort_order, recording_resource_id, thumbnail_url, photos")
         .eq("organization_id", orgId)
         .order("sort_order", { ascending: true });
       setSessionsRows(((data as any) ?? []).map((row: any) => ({ ...row, fathom_url: "", transcript_url: "" })));
@@ -525,6 +556,7 @@ export default function ClientEditor() {
         visibility: sr.visibility,
         recording_resource_id: recId,
         thumbnail_url: sr.thumbnail_url || null,
+        photos: sr.photos ?? [],
       })
       .eq("id", sr.id);
     if (error) fail(error.message);
@@ -746,6 +778,56 @@ export default function ClientEditor() {
     setItemOrderDirty(false);
     setItemOrderSaving(false);
     loadItems(org.id);
+  }
+
+  async function uploadThumb(lane: string, file: File, apply: (url: string) => void) {
+    if (!org) return fail("Portal still loading, try again in a second.");
+    setUploadBusy(lane);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("slug", org.slug);
+      fd.append("sign", "long");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || `Upload failed (${res.status})`);
+      const url = json.signed_url || json.url || json.signedUrl;
+      if (!url) throw new Error("Upload succeeded but no URL came back.");
+      apply(url);
+      flash("Photo uploaded.");
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      fail(err?.message ?? "Upload failed.");
+    } finally {
+      setUploadBusy(null);
+    }
+  }
+  function smartWrap(t, a0, b0, marker) {
+    // trim selection edges so markers hug text; toggle off if already wrapped
+    let a = a0, b = b0;
+    while (a < b && /\s/.test(t[a])) a++;
+    while (b > a && /\s/.test(t[b - 1])) b--;
+    const sel = t.slice(a, b);
+    const before = t.slice(0, a), after = t.slice(b);
+    if ((() => { const ch = marker[0]; let l = 0; while (l < before.length && before[before.length - 1 - l] === ch) l++; let r = 0; while (r < after.length && after[r] === ch) r++; return l >= marker.length && r >= marker.length && !(marker === "*" && l === 2 && r === 2); })()) {
+      // unwrap (toggle)
+      return { next: before.slice(0, -marker.length) + sel + after.slice(marker.length), s: a - marker.length, e: b - marker.length };
+    }
+    if (sel.startsWith(marker) && sel.endsWith(marker) && sel.length >= marker.length * 2) {
+      const inner = sel.slice(marker.length, sel.length - marker.length);
+      return { next: before + inner + after, s: a, e: a + inner.length };
+    }
+    const body = sel || "text";
+    return { next: before + marker + body + marker + after, s: a + marker.length, e: a + marker.length + body.length };
+  }
+
+  function wrapRecap(sr: SessionRow, marker: string) {
+    const ta = recapRef.current[sr.id];
+    if (!ta) return;
+    const t = sr.recap ?? "";
+    const { next, s, e: e2 } = smartWrap(t, ta.selectionStart ?? t.length, ta.selectionEnd ?? t.length, marker);
+    editSession(sr.id, { recap: next });
+    requestAnimationFrame(() => { ta.focus(); ta.setSelectionRange(s, e2); });
   }
 
   async function saveOrder() {
@@ -1355,7 +1437,19 @@ export default function ClientEditor() {
                           </label>
                           <label className="flex flex-col gap-1.5">
                             <span className={label}>Recap (shown after the session)</span>
-                            <textarea rows={4} className={input} value={sr.recap ?? ""} onChange={(e) => editSession(sr.id, { recap: e.target.value })} />
+                            <div className="flex items-center gap-1.5">
+                              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => wrapRecap(sr, "**")} className="rounded border border-line-subtle bg-paper px-2 py-0.5 text-[12px] font-bold text-storm hover:border-teal" title="Bold">B</button>
+                              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => wrapRecap(sr, "*")} className="rounded border border-line-subtle bg-paper px-2 py-0.5 text-[12px] italic text-storm hover:border-teal" title="Italic">I</button>
+                              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => wrapRecap(sr, "__")} className="rounded border border-line-subtle bg-paper px-2 py-0.5 text-[12px] underline text-storm hover:border-teal" title="Underline">U</button>
+                              <span className="ml-2 text-[11px] italic text-slate-50">select text, then B / I / U. Blank line = new paragraph.</span>
+                            </div>
+                            <textarea rows={5} ref={(el) => { recapRef.current[sr.id] = el; }} className={input} value={sr.recap ?? ""} onChange={(e) => editSession(sr.id, { recap: e.target.value })} />
+                            {(sr.recap ?? "").trim() !== "" && (
+                              <div className="w-full rounded border border-line-subtle bg-snow px-4 py-3">
+                                <span className="mb-1 block font-condensed text-[10px] font-bold uppercase tracking-label text-slate-50">Live preview {"\u00b7"} what clients see</span>
+                                <div className="text-[13.5px] leading-[1.7] text-slate-75">{recapPreview(sr.recap ?? "")}</div>
+                              </div>
+                            )}
                           </label>
                           {/* What the client needs to accomplish, attach key items to this session */}
                           <div className="flex flex-col gap-2 rounded border border-line-subtle bg-snow px-4 py-3.5">
@@ -1408,10 +1502,28 @@ export default function ClientEditor() {
                               <span className={label}>Fathom recording URL</span>
                               <input className="flex-1 rounded border border-line-subtle bg-paper px-3 py-1.5 text-[13px] text-ink" placeholder={sr.recording_resource_id ? "Linked \u2014 paste a new URL to replace, or leave blank to keep" : "https://fathom.video/\u2026"} value={(sr as any).fathom_url ?? ""} onChange={(e) => editSession(sr.id, { fathom_url: e.target.value } as any)} />
                             </label>
-                            <label className="flex min-w-[280px] flex-1 items-center gap-2">
-                              <span className={label}>Thumbnail URL (from Fathom)</span>
-                              <input className="flex-1 rounded border border-line-subtle bg-paper px-3 py-1.5 text-[13px] text-ink" placeholder="https://\u2026/thumb.jpg" value={sr.thumbnail_url ?? ""} onChange={(e) => editSession(sr.id, { thumbnail_url: e.target.value })} />
-                            </label>
+                            <div className="flex w-full flex-col items-start gap-2">
+                              <span className={label}>Recording thumbnail</span>
+                              <div className="flex w-full flex-col gap-2">
+                              {sr.thumbnail_url ? <img src={sr.thumbnail_url} alt="Thumbnail" className="h-16 w-28 rounded border border-line-subtle object-cover" /> : <span className="text-[12px] italic text-slate-50">No thumbnail yet</span>}
+                              <button type="button" onClick={(ev) => ((ev.currentTarget.nextElementSibling as HTMLInputElement) || null)?.click()} className="w-fit cursor-pointer rounded border border-line-subtle bg-snow px-3 py-1.5 font-condensed text-[10.5px] font-bold uppercase tracking-label text-storm transition-colors hover:border-teal" disabled={!!uploadBusy}>{uploadBusy === "thumb-" + sr.id && (<span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-storm/30 border-t-storm align-[-1px]" />)}{uploadBusy === "thumb-" + sr.id ? "Uploading\u2026" : "Upload thumbnail png"}</button>
+                              <input type="file" accept="image/*" className="hidden" onChange={(ev) => { const f = ev.target.files?.[0]; if (f) uploadThumb("thumb-" + sr.id, f, async (url) => { editSession(sr.id, { thumbnail_url: url }); await supabase.from("sessions").update({ thumbnail_url: url }).eq("id", sr.id); }); ev.target.value = ""; }} />
+                            </div>
+                            <div className="flex w-full flex-col gap-2">
+                              <span className={label}>Session photos</span>
+                              <div className="flex flex-wrap items-center gap-3">
+                                {(sr.photos ?? []).map((ph, pi) => (
+                                  <span key={pi} className="relative inline-block">
+                                    <img src={ph} alt={`Session photo ${pi + 1}`} className="h-16 w-24 rounded border border-line-subtle object-cover" />
+                                    <button onClick={async () => { const next = (sr.photos ?? []).filter((_, j) => j !== pi); editSession(sr.id, { photos: next }); await supabase.from("sessions").update({ photos: next }).eq("id", sr.id); flash("Photo removed."); }} className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-error-ink text-[10px] font-bold text-white">×</button>
+                                  </span>
+                                ))}
+                                <button type="button" onClick={(ev) => ((ev.currentTarget.nextElementSibling as HTMLInputElement) || null)?.click()} className="w-fit cursor-pointer rounded border border-line-subtle bg-snow px-3 py-1.5 font-condensed text-[10.5px] font-bold uppercase tracking-label text-storm transition-colors hover:border-teal" disabled={!!uploadBusy}>{uploadBusy === "photos-" + sr.id && (<span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-storm/30 border-t-storm align-[-1px]" />)}{uploadBusy === "photos-" + sr.id ? "Uploading\u2026" : "Upload sessions png"}</button>
+                              <input type="file" accept="image/*" className="hidden" onChange={(ev) => { const f = ev.target.files?.[0]; if (f) uploadThumb("photos-" + sr.id, f, async (url) => { const next = [ ...(sr.photos ?? []), url ]; editSession(sr.id, { photos: next }); await supabase.from("sessions").update({ photos: next }).eq("id", sr.id); }); ev.target.value = ""; }} />
+                              </div>
+                              <span className="text-[11.5px] italic text-slate-50">Any pictures taken in session. Clients see them on the session card.</span>
+                            </div>
+                            </div>
                             <button onClick={() => saveSession(sessionsRows.find((x) => x.id === sr.id)!)} className={btnGold}>Save session</button>
                           </div>
                         </div>
@@ -1626,7 +1738,11 @@ export default function ClientEditor() {
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
                     <input className="min-w-[280px] flex-1 rounded border border-line-subtle bg-snow px-3 py-2 text-[13px] text-ink" placeholder={sr.recording_resource_id ? "Linked, paste a new Fathom URL to replace" : "https://fathom.video/…"} value={(sr as any).fathom_url ?? ""} onChange={(e) => editSession(sr.id, { fathom_url: e.target.value } as any)} />
-                    <input className="min-w-[240px] flex-1 rounded border border-line-subtle bg-snow px-3 py-2 text-[13px] text-ink" placeholder="Thumbnail URL (from Fathom)" value={sr.thumbnail_url ?? ""} onChange={(e) => editSession(sr.id, { thumbnail_url: e.target.value })} />
+                    <div className="flex items-center gap-3">
+                      {sr.thumbnail_url ? <img src={sr.thumbnail_url} alt="Thumbnail" className="h-16 w-28 rounded border border-line-subtle object-cover" /> : <span className="text-[12px] italic text-slate-50">No thumbnail yet</span>}
+                      <button type="button" onClick={(ev) => ((ev.currentTarget.nextElementSibling as HTMLInputElement) || null)?.click()} className="w-fit cursor-pointer rounded border border-line-subtle bg-snow px-3 py-1.5 font-condensed text-[10.5px] font-bold uppercase tracking-label text-storm transition-colors hover:border-teal" disabled={!!uploadBusy}>{uploadBusy === "thumb-" + sr.id && (<span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-storm/30 border-t-storm align-[-1px]" />)}{uploadBusy === "thumb-" + sr.id ? "Uploading\u2026" : "Upload thumbnail png"}</button>
+                              <input type="file" accept="image/*" className="hidden" onChange={(ev) => { const f = ev.target.files?.[0]; if (f) uploadThumb("thumb-" + sr.id, f, async (url) => { editSession(sr.id, { thumbnail_url: url }); await supabase.from("sessions").update({ thumbnail_url: url }).eq("id", sr.id); }); ev.target.value = ""; }} />
+                    </div>
                     <input className="min-w-[240px] flex-1 rounded border border-line-subtle bg-snow px-3 py-2 text-[13px] text-ink" placeholder={resourcesRows.find((r) => r.id === sr.recording_resource_id)?.description?.startsWith("http") ? `Linked: ${resourcesRows.find((r) => r.id === sr.recording_resource_id)?.description}` : "Transcript URL (we provide this)"} value={(sr as any).transcript_url ?? ""} onChange={(e) => editSession(sr.id, { transcript_url: e.target.value } as any)} />
                     <button onClick={() => saveSession(sessionsRows.find((x) => x.id === sr.id)!)} className={btnGold}>Save</button>
                   </div>
@@ -1969,25 +2085,33 @@ function PhaseBodyBuilder({ initial, onChange }: { initial: string | null; onCha
     const live = document.activeElement === ta;
     return { a0: live ? ta.selectionStart : rem?.a ?? 0, b0: live ? ta.selectionEnd : rem?.b ?? 0 };
   };
+  const smartWrapLocal = (t: string, a0: number, b0: number, marker: string) => {
+    let a = a0, b = b0;
+    while (a < b && /\s/.test(t[a])) a++;
+    while (b > a && /\s/.test(t[b - 1])) b--;
+    const sel = t.slice(a, b);
+    const before = t.slice(0, a), after = t.slice(b);
+    if ((() => { const ch = marker[0]; let l = 0; while (l < before.length && before[before.length - 1 - l] === ch) l++; let r = 0; while (r < after.length && after[r] === ch) r++; return l >= marker.length && r >= marker.length && !(marker === "*" && l === 2 && r === 2); })()) return { next: before.slice(0, -marker.length) + sel + after.slice(marker.length), s: a - marker.length, e: b - marker.length };
+    if (sel.startsWith(marker) && sel.endsWith(marker) && sel.length >= marker.length * 2) { const inner = sel.slice(marker.length, sel.length - marker.length); return { next: before + inner + after, s: a, e: a + inner.length }; }
+    const body = sel || "text";
+    return { next: before + marker + body + marker + after, s: a + marker.length, e: a + marker.length + body.length };
+  };
   const wrapSimple = (marker: string) => {
     const ta = taRefs.current["simple"];
     if (!ta) return;
     const { a0, b0 } = readSel("simple");
-    const sel = ta.value.slice(a0, b0) || "text";
-    const next = ta.value.slice(0, a0) + marker + sel + marker + ta.value.slice(b0);
+    const { next, s, e } = smartWrapLocal(ta.value, a0, b0, marker);
     setText(next);
     onChange(next);
-    requestAnimationFrame(() => { ta.focus(); ta.setSelectionRange(a0 + marker.length, a0 + marker.length + sel.length); });
+    requestAnimationFrame(() => { ta.focus(); ta.setSelectionRange(s, e); });
   };
   const wrapSel = (i: number, marker: string) => {
     const ta = taRefs.current[i];
     if (!ta) return;
     const { a0, b0 } = readSel(i);
-    const value = ta.value;
-    const sel = value.slice(a0, b0) || "text";
-    const next = value.slice(0, a0) + marker + sel + marker + value.slice(b0);
+    const { next, s, e } = smartWrapLocal(ta.value, a0, b0, marker);
     updRich({ paragraphs: rich.paragraphs.map((x, j) => (j === i ? { ...x, text: next } : x)) });
-    requestAnimationFrame(() => { ta.focus(); ta.setSelectionRange(a0 + marker.length, a0 + marker.length + sel.length); });
+    requestAnimationFrame(() => { ta.focus(); ta.setSelectionRange(s, e); });
   };
 
   const updRich = (patch: Partial<RichState>) => {

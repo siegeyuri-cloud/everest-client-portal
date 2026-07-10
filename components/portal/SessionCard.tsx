@@ -14,6 +14,46 @@ export interface SessionCardProps {
   onViewRecordings?: (num: string) => void;
 }
 
+
+function everestInline(text: string, depth = 0): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  const re = /(\*\*\*[^*\n]+\*\*\*|\*\*(?:[^*\n]|\*(?!\*))+?\*\*|__(?:[^_\n]|_(?!_))+?__|\*[^\s*][^*\n]*?\*)/g;
+  let last = 0, m: RegExpExecArray | null, k = 0;
+  const rec = (t: string) => (depth < 3 ? everestInline(t, depth + 1) : [t]);
+  while ((m = re.exec(text))) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    const tok = m[0];
+    if (tok.startsWith("***")) parts.push(<strong key={k++} className="font-bold text-storm"><em>{tok.slice(3, -3)}</em></strong>);
+    else if (tok.startsWith("**")) parts.push(<strong key={k++} className="font-bold text-storm">{rec(tok.slice(2, -2))}</strong>);
+    else if (tok.startsWith("__")) parts.push(<u key={k++}>{rec(tok.slice(2, -2))}</u>);
+    else parts.push(<em key={k++}>{rec(tok.slice(1, -1))}</em>);
+    last = m.index + tok.length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
+function everestLine(ln: string, key: React.Key): React.ReactNode {
+  const bullet = ln.match(/^\s*(?:[-\u2022\*])\s+(.*)$/);
+  if (bullet) {
+    return (
+      <span key={key} className="flex gap-2 pl-1">
+        <span className="select-none text-gold">{"\u2022"}</span>
+        <span className="flex-1">{everestInline(bullet[1])}</span>
+      </span>
+    );
+  }
+  return <span key={key} className="block">{everestInline(ln)}</span>;
+}
+
+function richRecap(text: string) {
+  return text.split(/\n\s*\n/).map((para, i) => (
+    <span key={i} className={"block" + (i > 0 ? " mt-3" : "")}>
+      {para.split("\n").map((ln, j) => everestLine(ln, j))}
+    </span>
+  ));
+}
+
 export default function SessionCard({ session, onOpenResources, onViewKeyItems, onViewRecordings }: SessionCardProps) {
   const [open, setOpen] = React.useState(false);
   return (
@@ -37,7 +77,16 @@ export default function SessionCard({ session, onOpenResources, onViewKeyItems, 
       {open && (
         <div className="animate-fade-up border-t border-line-subtle px-7 py-5">
           <p className="text-[14px] leading-[1.7] text-slate-75">
-            {session.recap || "Recap posts here after the session."}
+            {session.recap ? richRecap(session.recap) : "Recap posts here after the session."}
+            {Array.isArray((session as any).photos) && (session as any).photos.length > 0 && (
+              <span className="mt-4 flex flex-wrap gap-3">
+                {(session as any).photos.map((ph: string, i: number) => (
+                  <a key={i} href={ph} target="_blank" rel="noreferrer">
+                    <img src={ph} alt={`Session photo ${i + 1}`} className="h-36 w-56 rounded-lg border border-line-subtle object-cover shadow-sm transition-transform hover:scale-[1.03]" />
+                  </a>
+                ))}
+              </span>
+            )}
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-5">
             {session.hasRecording ? (

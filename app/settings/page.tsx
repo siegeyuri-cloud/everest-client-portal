@@ -13,6 +13,10 @@ export default function AccountSettings() {
   const [busy, setBusy] = React.useState(false);
   const [msg, setMsg] = React.useState<string | null>(null);
   const [err, setErr] = React.useState<string | null>(null);
+  const [pw1, setPw1] = React.useState("");
+  const [pw2, setPw2] = React.useState("");
+  const [pwBusy, setPwBusy] = React.useState(false);
+  const [pwMsg, setPwMsg] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     (async () => {
@@ -38,6 +42,18 @@ export default function AccountSettings() {
       setFile(null);
       setMsg("Saved. Your profile is updated.");
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+  }
+
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwMsg(null);
+    if (pw1.length < 8) { setPwMsg("Password needs at least 8 characters."); return; }
+    if (pw1 !== pw2) { setPwMsg("Passwords do not match."); return; }
+    setPwBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: pw1 });
+    setPwBusy(false);
+    setPwMsg(error ? error.message : "Password changed.");
+    if (!error) { setPw1(""); setPw2(""); }
   }
 
   return (
@@ -67,6 +83,22 @@ export default function AccountSettings() {
           </label>
           {err && <div className="rounded bg-error-ink/10 px-4 py-2.5 text-[13px] text-error-ink">{err}</div>}
           {msg && <div className="rounded bg-teal-50 px-4 py-2.5 text-[13px] text-storm">{msg}</div>}
+          <div className="flex flex-col gap-3 border-t border-line-subtle pt-5">
+            <span className="font-condensed text-[11px] font-bold uppercase tracking-label text-slate-75">Change password</span>
+            <input type="password" placeholder="New password" value={pw1} onChange={(e) => setPw1(e.target.value)} className="rounded border border-line-subtle bg-snow px-4 py-3 text-[14px] text-ink outline-none focus:border-teal" />
+            <input type="password" placeholder="Repeat new password" value={pw2} onChange={(e) => setPw2(e.target.value)} className="rounded border border-line-subtle bg-snow px-4 py-3 text-[14px] text-ink outline-none focus:border-teal" />
+            {pwMsg && <div className="text-[13px] text-slate-75">{pwMsg}</div>}
+            <button type="button" onClick={changePassword} disabled={pwBusy} className="w-fit rounded border border-line-subtle bg-snow px-5 py-2.5 font-condensed text-[12px] font-bold uppercase tracking-label text-storm transition-colors hover:border-teal">
+              {pwBusy ? "Changing\u2026" : "Change password"}
+            </button>
+          </div>
+          <div className="flex flex-col gap-2 border-t border-line-subtle pt-5">
+            <span className="font-condensed text-[11px] font-bold uppercase tracking-label text-error-ink">Danger zone</span>
+            <p className="text-[12.5px] leading-relaxed text-slate-50">Want your account and data removed? Send a deletion request and the Everest team will confirm and complete it.</p>
+            <a href="mailto:hello@everestcollective.com?subject=Account%20deletion%20request&body=Please%20delete%20my%20Everest%20Collective%20portal%20account." className="w-fit font-condensed text-[11px] font-bold uppercase tracking-label text-error-ink underline-offset-2 hover:underline">
+              Request account deletion
+            </a>
+          </div>
           <div className="flex items-center justify-between">
             <button type="submit" disabled={busy} className="rounded bg-gold px-6 py-3 font-condensed text-[13px] font-bold uppercase tracking-label text-storm transition-transform duration-150 hover:bg-gold-deep active:scale-[0.97]">
               {busy ? "Saving\u2026" : "Save profile"}

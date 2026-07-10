@@ -190,6 +190,7 @@ export function mapSession(row: any, index: number, keyItems: any[] = []): Sessi
     actionItemCount: keyItems.filter((k) => k.linked_session_id === row.id).length,
     hasRecording: !!row.recording_resource_id,
     recap: row.recap ?? "",
+    photos: Array.isArray(row.photos) ? row.photos : [],
   };
 }
 
@@ -246,13 +247,14 @@ export function mapRecordings(sessions: any[], resources: any[] = []): Recording
   return sessions.map((s, i) => ({
     num: pad2(i + 1, i + 1),
     title: s.title,
-    note: s.recap ?? s.objective ?? "",
+    note: (() => { const t = (s.recap ?? s.objective ?? "").replace(/\*\*|__|\*/g, "").replace(/^[-\u2022]\s+/gm, "").replace(/\n+/g, " ").trim(); return t.length > 140 ? t.slice(0, 140).trimEnd() + "\u2026" : t; })(),
     duration: "—",
     available: !!s.recording_resource_id,
     url: resources.find((r) => r.id === s.recording_resource_id)?.url ?? "",
     transcriptUrl: (() => { const d = resources.find((r) => r.id === s.recording_resource_id)?.description ?? ""; return d.startsWith("http") ? d : ""; })(),
     lockNote: "Posts after the session",
     hasThumb: !!s.thumbnail_url,
+    thumb: s.thumbnail_url ?? "",
   }));
 }
 

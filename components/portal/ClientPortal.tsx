@@ -67,7 +67,7 @@ const SCREEN_LABELS: Record<NavKey, string> = {
   journey: "Engagement Journey",
   sessions: "Working Sessions",
   keyItems: "Key Items",
-  recordings: "Recordings + Transcripts",
+  recordings: "Recordings",
   resources: "Resources",
   logistics: "Logistics",
   internal: "Team Notes (Internal)",
