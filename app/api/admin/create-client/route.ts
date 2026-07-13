@@ -172,7 +172,7 @@ export async function POST(request: Request) {
     // 4. Optional first invite.
     let invited: string | null = null;
     if (inviteEmail) {
-      const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/set-password`;
+      const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/accept`;
       const { data: invite, error: invErr } = await admin.auth.admin.inviteUserByEmail(inviteEmail, {
         redirectTo,
       });
