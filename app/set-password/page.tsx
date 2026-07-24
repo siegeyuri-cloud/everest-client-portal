@@ -56,13 +56,13 @@ export default function SetPasswordPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-10 pb-8 pt-10">
           <div className="flex flex-col gap-2">
             <div className="font-condensed text-[13px] font-bold uppercase tracking-eyebrow text-gold-deep">
-              First Ascent
+              Account Access
             </div>
             <div className="font-display text-[25px] uppercase leading-[1.1] tracking-display text-storm">
-              Set your password
+              Reset your password
             </div>
             <div className="text-[13px] leading-relaxed text-slate-75">
-              Choose a password for your workspace. You&rsquo;ll land in your portal right after.
+              Enter a new password below. YouChoose a password for your workspace. You&rsquo;ll land in your portal right after.rsquo;ll land in your portal right after.
             </div>
           </div>
 
