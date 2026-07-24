@@ -62,7 +62,7 @@ export default function SetPasswordPage() {
               Reset your password
             </div>
             <div className="text-[13px] leading-relaxed text-slate-75">
-              Enter a new password below. YouChoose a password for your workspace. You&rsquo;ll land in your portal right after.rsquo;ll land in your portal right after.
+              Enter a new password below. You will land in your portal right after.rsquo;ll land in your portal right after.
             </div>
           </div>
 
