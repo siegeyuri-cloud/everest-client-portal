@@ -34,11 +34,20 @@ function everestInline(text: string, depth = 0): React.ReactNode[] {
 }
 
 type RecapBlock =
+  | { kind: "lead"; text: string }
   | { kind: "h1"; text: string }
   | { kind: "h2"; text: string }
   | { kind: "callout"; lines: string[] }
   | { kind: "list"; items: string[] }
   | { kind: "para"; lines: string[] };
+
+function wholeLineBold(t: string): string | null {
+  const m = t.trim().match(/^\*\*([\s\S]+)\*\*$/);
+  if (!m) return null;
+  const inner = m[1].trim();
+  if (inner.includes("**") || /^__[\s\S]+__$/.test(inner)) return null;
+  return inner;
+}
 
 function wholeLineHeading(t: string): string | null {
   let s = t.trim();
@@ -64,10 +73,12 @@ function parseRecapBlocks(src: string): RecapBlock[] {
   for (const raw of lines) {
     const t = raw.trim();
     if (t === "") { flushPara(); sawBlank = true; continue; }
+    const atStart = blocks.length === 0 && para.length === 0;
     const headText = wholeLineHeading(t);
     if (t.startsWith("##")) { flushPara(); blocks.push({ kind: "h2", text: t.replace(/^##\s*/, "") }); }
     else if (t.startsWith("#")) { flushPara(); blocks.push({ kind: "h1", text: t.replace(/^#\s*/, "") }); }
     else if (headText) { flushPara(); blocks.push({ kind: "h1", text: headText }); }
+    else if (atStart && wholeLineBold(t)) { blocks.push({ kind: "lead", text: wholeLineBold(t)! }); }
     else if (/^>\s?/.test(t)) {
       flushPara();
       const body = t.replace(/^>\s?/, "");
@@ -91,6 +102,8 @@ function parseRecapBlocks(src: string): RecapBlock[] {
 
 function richRecap(text: string) {
   return parseRecapBlocks(text).map((b, i) => {
+    if (b.kind === "lead")
+      return <p key={i} className="mb-4 mt-0 text-[16.5px] font-semibold leading-[1.5] text-storm">{everestInline(b.text)}</p>;
     if (b.kind === "h1")
       return <h4 key={i} className="mb-2 mt-6 first:mt-0 font-condensed text-[13px] font-bold uppercase tracking-label text-gold-deep">{everestInline(b.text)}</h4>;
     if (b.kind === "h2")
@@ -142,7 +155,7 @@ export default function SessionCard({ session, onOpenResources, onViewKeyItems, 
       </button>
       {open && (
         <div className="animate-fade-up border-t border-line-subtle px-7 py-5">
-          <div className="max-w-[68ch] text-[14px] leading-[1.75] text-ink">
+          <div className="text-[14px] leading-[1.75] text-ink">
             {session.recap ? richRecap(session.recap) : <p className="text-slate-50">Recap posts here after the session.</p>}
           </div>
           {Array.isArray((session as any).photos) && (session as any).photos.length > 0 && (
