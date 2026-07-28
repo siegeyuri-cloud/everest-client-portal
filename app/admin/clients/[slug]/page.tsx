@@ -156,6 +156,9 @@ export default function ClientEditor() {
   const [categories, setCategories] = React.useState<any[]>([]);
   const [resourcesRows, setResourcesRows] = React.useState<any[]>([]);
   const [resourcesDirty, setResourcesDirty] = React.useState(false);
+  const [dragResId, setDragResId] = React.useState<string | null>(null);
+  const [resourceOrderDirty, setResourceOrderDirty] = React.useState(false);
+  const [resourceOrderSaving, setResourceOrderSaving] = React.useState(false);
   const [uploadingId, setUploadingId] = React.useState<string | null>(null);
   const [notesRows, setNotesRows] = React.useState<any[]>([]);
   const [dirtyNoteIds, setDirtyNoteIds] = React.useState<Set<string>>(new Set());
@@ -242,7 +245,7 @@ export default function ClientEditor() {
   }
 
   function switchTab(t: (typeof TABS)[number]) {
-    if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || dirtyNoteIds.size > 0) {
+    if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || resourceOrderDirty || dirtyNoteIds.size > 0) {
       setConfirmBox({
         message: "You have unsaved changes. Leave this tab without saving?",
         onYes: () => {
@@ -258,7 +261,7 @@ export default function ClientEditor() {
   // Browser-level guard: refresh/close with unsaved edits triggers Chrome's warning.
   React.useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
-      if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || dirtyNoteIds.size > 0) {
+      if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || resourceOrderDirty || dirtyNoteIds.size > 0) {
         e.preventDefault();
         e.returnValue = "";
       }
@@ -880,6 +883,41 @@ export default function ClientEditor() {
   const editCat = (id: string, patch: any) => { setCategories((xs) => xs.map((x) => (x.id === id ? { ...x, ...patch } : x))); setResourcesDirty(true); };
   const editRes = (id: string, patch: any) => { setResourcesRows((xs) => xs.map((x) => (x.id === id ? { ...x, ...patch } : x))); setResourcesDirty(true); };
 
+  function reorderResourceOver(targetId: string) {
+    if (!dragResId || dragResId === targetId) return;
+    const apply = () =>
+      flushSync(() =>
+        setResourcesRows((prev) => {
+          const list = [...prev];
+          const from = list.findIndex((x) => x.id === dragResId);
+          const to = list.findIndex((x) => x.id === targetId);
+          if (from < 0 || to < 0 || from === to) return prev;
+          const [moved] = list.splice(from, 1);
+          list.splice(to, 0, moved);
+          return list.map((x, idx) => ({ ...x, sort_order: idx + 1 }));
+        })
+      );
+    if (typeof document !== "undefined" && (document as any).startViewTransition) {
+      (document as any).startViewTransition(apply);
+    } else apply();
+    setResourceOrderDirty(true);
+  }
+
+  async function saveResourceOrder() {
+    if (!org) return;
+    setResourceOrderSaving(true);
+    const w1 = await Promise.all(resourcesRows.map((x) => supabase.from("resources").update({ sort_order: (x.sort_order ?? 0) + 1000 }).eq("id", x.id)));
+    const e1 = w1.find((r) => r.error);
+    if (e1?.error) { setResourceOrderSaving(false); return fail(e1.error.message); }
+    const w2 = await Promise.all(resourcesRows.map((x) => supabase.from("resources").update({ sort_order: x.sort_order ?? 0 }).eq("id", x.id)));
+    const e2 = w2.find((r) => r.error);
+    if (e2?.error) { setResourceOrderSaving(false); return fail(e2.error.message); }
+    flash("Order saved.");
+    setResourceOrderDirty(false);
+    setResourceOrderSaving(false);
+    loadResources(org.id);
+  }
+
   async function saveResources() {
     if (!org) return;
     for (const c of categories) {
@@ -1037,10 +1075,10 @@ export default function ClientEditor() {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href={`/${org.slug}`} onClick={(e) => { if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || dirtyNoteIds.size > 0) { e.preventDefault(); setConfirmBox({ message: "You have unsaved changes. Leave the editor without saving?", onYes: () => router.push(`/${org.slug}`) }); } }} className="font-condensed text-[12px] font-bold uppercase tracking-wide text-ondark-muted transition-colors duration-200 ease-climb hover:text-teal">
+            <Link href={`/${org.slug}`} onClick={(e) => { if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || resourceOrderDirty || dirtyNoteIds.size > 0) { e.preventDefault(); setConfirmBox({ message: "You have unsaved changes. Leave the editor without saving?", onYes: () => router.push(`/${org.slug}`) }); } }} className="font-condensed text-[12px] font-bold uppercase tracking-wide text-ondark-muted transition-colors duration-200 ease-climb hover:text-teal">
               View portal →
             </Link>
-            <Link href="/admin" onClick={(e) => { if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || dirtyNoteIds.size > 0) { e.preventDefault(); setConfirmBox({ message: "You have unsaved changes. Leave the editor without saving?", onYes: () => router.push("/admin") }); } }} className="font-condensed text-[12px] font-bold uppercase tracking-wide text-ondark-muted transition-colors duration-200 ease-climb hover:text-gold">
+            <Link href="/admin" onClick={(e) => { if (dirty || phasesDirty || itemsDirty || logisticsDirty || sessionsDirty || sessionOrderDirty || itemOrderDirty || resourcesDirty || resourceOrderDirty || dirtyNoteIds.size > 0) { e.preventDefault(); setConfirmBox({ message: "You have unsaved changes. Leave the editor without saving?", onYes: () => router.push("/admin") }); } }} className="font-condensed text-[12px] font-bold uppercase tracking-wide text-ondark-muted transition-colors duration-200 ease-climb hover:text-gold">
               ← All clients
             </Link>
           </div>
@@ -1776,12 +1814,34 @@ export default function ClientEditor() {
             <div className="rounded-lg border border-line-subtle bg-paper p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <h2 className="font-condensed text-[13px] font-bold uppercase tracking-label text-slate-75">Resources</h2>
-                <button onClick={addResource} className={btnGold}>+ Add resource</button>
+                <div className="flex items-center gap-3">
+                  <button onClick={saveResourceOrder} disabled={!resourceOrderDirty || resourceOrderSaving} className={resourceOrderDirty ? "rounded bg-teal px-5 py-2.5 font-condensed text-[12px] font-bold uppercase tracking-label text-white shadow-sm transition-all duration-200 ease-climb hover:bg-teal-deep" : btnGhost + " opacity-40 cursor-not-allowed"}>
+                    {resourceOrderSaving && (<span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white align-[-1px]" />)}
+                    {resourceOrderSaving ? "Saving\u2026" : "Save order"}
+                  </button>
+                  <button onClick={addResource} className={btnGold}>+ Add resource</button>
+                </div>
               </div>
               <div className="mt-4 flex flex-col gap-4">
                 {resourcesRows.map((r) => (
-                  <div key={r.id} data-spot={r.id} className={"flex flex-col gap-3 rounded border border-line-subtle bg-snow px-4 py-4" + newRing(r.id)}>
+                  <div
+                    key={r.id}
+                    data-spot={r.id}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDragEnter={() => reorderResourceOver(r.id)}
+                    onDrop={(e) => { e.preventDefault(); setDragResId(null); }}
+                    style={{ viewTransitionName: `resource-${r.id.replace(/[^a-zA-Z0-9-]/g, "")}` }}
+                    className={"flex flex-col gap-3 rounded border border-line-subtle bg-snow px-4 py-4" + (dragResId === r.id ? " opacity-60 shadow-lg ring-1 ring-gold/60" : newRing(r.id))}
+                  >
                     <div className="flex flex-wrap items-center gap-3">
+                      <span
+                        aria-hidden
+                        draggable
+                        onDragStart={() => setDragResId(r.id)}
+                        onDragEnd={() => setDragResId(null)}
+                        className="cursor-grab select-none px-1 text-[15px] tracking-widest text-slate-50 transition-colors hover:text-storm active:cursor-grabbing"
+                        title="Drag to reorder"
+                      >⋮⋮</span>
                       <input className="min-w-[200px] flex-1 rounded border border-line-subtle bg-paper px-3 py-2 text-[13.5px] font-semibold text-ink" value={r.title} onChange={(e) => editRes(r.id, { title: e.target.value })} />
                       <select className="rounded border border-line-subtle bg-paper px-2.5 py-2 font-condensed text-[11px] font-bold uppercase tracking-label text-storm" value={r.category_id ?? ""} onChange={(e) => editRes(r.id, { category_id: e.target.value || null })}>
                         <option value="">No category</option>
