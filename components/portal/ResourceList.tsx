@@ -4,6 +4,7 @@ import * as React from "react";
 import type { ResourceSection } from "./types";
 import SectionHeading from "./SectionHeading";
 import { PeakBullet } from "./icons";
+import { trackFileOpen } from "@/lib/track";
 
 /**
  * ResourceList — the collapsible field-guide accordion. Each section expands
@@ -57,7 +58,7 @@ export default function ResourceList({ sections, openNums, onToggle }: ResourceL
                           <PeakBullet tone={it.tone} className="translate-y-[-1px]" />
                           <span className="text-[14px] leading-[1.6] text-ink">
                             {it.href ? (
-                              <a href={it.href} target="_blank" rel="noreferrer" className="font-semibold text-storm underline decoration-line-subtle underline-offset-2 transition-colors duration-200 hover:text-teal-deep">
+                              <a href={it.href} target="_blank" rel="noreferrer" onClick={() => trackFileOpen("resource", String(it.label), String(it.label))} className="font-semibold text-storm underline decoration-line-subtle underline-offset-2 transition-colors duration-200 hover:text-teal-deep">
                                 {it.label}
                               </a>
                             ) : (

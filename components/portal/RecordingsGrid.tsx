@@ -2,6 +2,7 @@ import * as React from "react";
 import type { Recording } from "./types";
 import SectionHeading from "./SectionHeading";
 import { PlayTriangle } from "./icons";
+import { trackFileOpen } from "@/lib/track";
 
 /**
  * RecordingsGrid — video/readout cards. Available items show a play button and
@@ -50,6 +51,7 @@ export default function RecordingsGrid({ recordings, teamPhoto, highlightNum }: 
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Watch recording"
+                    onClick={() => trackFileOpen("recording", String(rec.title), String(rec.title))}
                     className="relative flex h-14 w-14 transform-gpu cursor-pointer items-center justify-center rounded-full border-2 border-gold bg-storm/85 transition-all duration-300 ease-out will-change-transform hover:scale-110 hover:bg-storm/95 hover:shadow-lg"
                   >
                     <PlayTriangle />
@@ -73,12 +75,12 @@ export default function RecordingsGrid({ recordings, teamPhoto, highlightNum }: 
                 {rec.available && (
                   <div className="flex gap-4 pt-1">
                     {rec.url && (
-                      <a href={rec.url} target="_blank" rel="noreferrer" className="font-condensed text-[12px] font-bold uppercase tracking-label text-teal-deep">
+                      <a href={rec.url} target="_blank" rel="noreferrer" onClick={() => trackFileOpen("recording", String(rec.title), String(rec.title))} className="font-condensed text-[12px] font-bold uppercase tracking-label text-teal-deep">
                         Watch {"\u2192"}
                       </a>
                     )}
                     {rec.transcriptUrl && (
-                      <a href={rec.transcriptUrl} target="_blank" rel="noreferrer" className="font-condensed text-[12px] font-bold uppercase tracking-label text-teal-deep">
+                      <a href={rec.transcriptUrl} target="_blank" rel="noreferrer" onClick={() => trackFileOpen("transcript", String(rec.title), String(rec.title))} className="font-condensed text-[12px] font-bold uppercase tracking-label text-teal-deep">
                         Transcript →
                       </a>
                     )}
