@@ -177,7 +177,35 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true, data });
+  // A comped guest is done the moment they register. No payment follows,
+  // so no webhook will ever fire for them, so nothing else would ever
+  // issue their ticket. That is roughly 270 of 300 attendees, which is
+  // to say most of the room would arrive at the door with nothing to
+  // scan. Issue it here instead.
+  //
+  // A failure here must not fail the registration. Their seat is real
+  // either way; a missing ticket is recoverable and shows up in the
+  // admin table as a row with no token.
+  let ticketToken: string | null = null;
+
+  if (data?.status === "comped" && data?.registration_id) {
+    const { data: issued, error: issueError } = await supabase.rpc(
+      "issue_gala_ticket",
+      { p_registration_id: data.registration_id }
+    );
+
+    if (issueError || issued?.ok !== true) {
+      console.error("[gala/register] could not issue comped ticket", {
+        reference: data.reference,
+        registrationId: data.registration_id,
+        error: issueError?.message ?? issued?.reason ?? "unknown",
+      });
+    } else {
+      ticketToken = issued.token ?? null;
+    }
+  }
+
+  return NextResponse.json({ ok: true, data: { ...data, ticket_token: ticketToken } });
 }
 
 export async function GET() {
