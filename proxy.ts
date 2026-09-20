@@ -1,7 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/auth"];
+// Gala registration is public by design: invited guests, ticket buyers and
+// sponsors complete a registration without ever having a portal account.
+// Everything else still requires a session.
+const PUBLIC_PATHS = ["/login", "/auth", "/api/gala", "/gala"];
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
