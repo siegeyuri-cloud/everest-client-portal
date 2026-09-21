@@ -324,7 +324,7 @@ export default function GalaWizard({
     // Seats to fill besides their own. A host table seats ten; a
     // sponsorship brings whatever its tier includes.
     const rosterN = door === "host" ? 9
-      : door === "sponsor" ? Math.max((chosenTier?.seats ?? 10) - 1, 0)
+      : door === "sponsor" ? Math.max((chosenTier?.seatCount ?? 10) - 1, 0)
       : 0;
 
     // One row per seat. The field names are what harvest() picks up,
@@ -384,16 +384,14 @@ export default function GalaWizard({
       rosterN: String(rosterN),
       rosterRows,
       rosterFilled: String(rosterFilled),
-      rosterByEmail,
+      // rosterByEmail and the mode colours are set further down, where
+      // they already were. Only showCodes is new.
       showCodes: !rosterByEmail,
-      emailModeBg: em.bg, emailModeBorder: em.border,
-      codeModeBg: cm.bg, codeModeBorder: cm.border,
 
       payLabel: door === "sponsor" ? "Sponsorship" : door === "host" ? "Table" : "Seats",
       payAmount: amountCents > 0
         ? `$${(amountCents / 100).toLocaleString("en-US")}`
         : "To be confirmed",
-      isComp: comped,
 
       youHalf: withValues(YOU_HALF, form, err),
       youFull: withValues(YOU_FULL, form, err),
