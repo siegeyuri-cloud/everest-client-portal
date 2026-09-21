@@ -371,6 +371,15 @@ export default function GalaWizard({
         : key === "pay" ? "Done for now"
         : "Continue",
 
+      showHostCode: done && hostCode !== null,
+      hostCodeLabel: door === "sponsor" ? "Your guest code" : "Your table code",
+      hostCode: hostCode ?? "",
+      hostCodeNote: rosterByEmail
+        ? "We are emailing everyone you listed. Anyone you did not list can use this code, and each guest registers themselves."
+        : door === "sponsor"
+          ? "Send this to your guests. Each one registers themselves with it, and your seats fill as they do."
+          : "Send this to your guests. Each one registers themselves with it, and your table fills as they do.",
+
       rosterLabel: door === "sponsor" ? "Who is coming with you" : "Fill your table",
       rosterN: String(rosterN),
       rosterRows,
@@ -454,7 +463,8 @@ export default function GalaWizard({
       calendarUrl: "#",
     };
   }, [open, door, step, key, steps.length, form, err, seats, hasGuest,
-      rosterByEmail, codeInfo, done, tiers, tierId, sending, ref, amountCents, comped]);
+      rosterByEmail, codeInfo, done, tiers, tierId, sending, ref, amountCents, comped,
+      hostCode]);
 
   const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
 

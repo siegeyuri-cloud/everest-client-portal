@@ -192,6 +192,11 @@ test("9. the host door registers and then shows what is owed", async ({ page }) 
   // And finishing lands on the confirmation with a real reference.
   await page.getByRole("button", { name: "Done for now" }).click();
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
+
+  // The host leaves with the one code their guests will use. Scoped to
+  // the box, because COLLECTIVE- also appears in the code step's help
+  // text elsewhere in the modal.
+  await expect(page.locator("[data-host-code]")).toContainText(/COLLECTIVE-[A-Z0-9-]+/);
 });
 
 test("10. the sponsor door carries the chosen tier's price into pay", async ({ page }) => {

@@ -176,9 +176,6 @@
                     <sc-if value="{{ rosterByEmail }}" hint-placeholder-val="{{ true }}">
                       <input type="email" name="{{ r.emailField }}" value="{{ r.email }}" placeholder="Their email" style="flex:1 1 150px;min-width:0;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:15px;padding:13px 14px;outline:none;">
                     </sc-if>
-                    <sc-if value="{{ showCodes }}" hint-placeholder-val="{{ false }}">
-                      <span style="flex:1 1 150px;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;letter-spacing:0.04em;color:var(--fl-gold);word-break:break-all;">{{ r.code }}</span>
-                    </sc-if>
                   </div>
                 </sc-for>
               </div>
@@ -338,6 +335,13 @@
               </sc-if>
               <sc-if value="{{ hasGuest }}" hint-placeholder-val="{{ false }}">
                 <p style="margin:0;max-width:440px;font-size:13.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.6);">We are texting {{ doneGuest }} one question. It takes thirty seconds and it is the difference between a badge that starts a conversation and one that wastes the ink.</p>
+              </sc-if>
+              <sc-if value="{{ showHostCode }}" hint-placeholder-val="{{ false }}">
+                <div data-host-code style="display:flex;flex-direction:column;gap:10px;align-items:center;border:1px dashed rgba(192,149,81,0.45);background:rgba(192,149,81,0.05);padding:24px 26px;max-width:440px;">
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">{{ hostCodeLabel }}</span>
+                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:22px;letter-spacing:0.06em;color:var(--fl-ivory);word-break:break-all;">{{ hostCode }}</span>
+                  <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.55;color:rgba(244,238,226,0.66);">{{ hostCodeNote }}</span>
+                </div>
               </sc-if>
               <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;width:100%;max-width:340px;">
                 <a href="{{ calendarUrl }}" style="background:var(--fl-gold);color:#0B1521;font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:18px;text-align:center;">Add to calendar</a>
