@@ -99,8 +99,10 @@ export async function POST(req: Request) {
   if (!door) return fail("Please choose how you are joining us.", 400);
 
   // Browser tests register real rows on purpose, but nobody needs the
-  // inbox full of them. The header only ever comes from Playwright.
-  const isTest = req.headers.get("x-pw-test") === "1";
+  // inbox full of them. Gated on the environment as well as the header,
+  // so a stranger cannot suppress a real confirmation by sending it.
+  const isTest =
+    process.env.NODE_ENV !== "production" && req.headers.get("x-pw-test") === "1";
 
   const email = String(body?.email ?? "").trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) {
