@@ -247,18 +247,41 @@ export default function GalaWizard({ template }: { template: string }) {
     return () => root.removeEventListener("click", onClick);
   }, [actions]);
 
-  // The RSVP buttons live in the server-rendered page, outside this
+  // The page's own buttons live in server-rendered HTML outside this
   // component, so they are wired from here.
+  //
+  // Two kinds. The RSVP buttons open on the door picker. The four door
+  // cards in the doors section open straight onto the door the visitor
+  // already chose, rather than asking them to choose twice.
   useEffect(() => {
-    const onOpen = (e: Event) => {
-      e.preventDefault();
-      setOpen(true); setDoor(null); setStep(-1); setDone(false);
+    const byAct: Record<string, Door | null> = {
+      openDoors: null,
+      pickSeat: "seat",
+      pickHost: "host",
+      pickGuest: "guest",
+      pickSponsor: "sponsor",
     };
-    const els = Array.from(
-      document.querySelectorAll<HTMLElement>('[data-act="openDoors"]')
-    );
-    els.forEach((el) => el.addEventListener("click", onOpen));
-    return () => els.forEach((el) => el.removeEventListener("click", onOpen));
+
+    const bound: Array<[HTMLElement, (e: Event) => void]> = [];
+
+    for (const [act, d] of Object.entries(byAct)) {
+      document
+        .querySelectorAll<HTMLElement>(`#gala-content [data-act="${act}"]`)
+        .forEach((el) => {
+          const handler = (e: Event) => {
+            e.preventDefault();
+            setDone(false);
+            setErr({});
+            setOpen(true);
+            if (d === null) { setDoor(null); setStep(-1); }
+            else { setDoor(d); setStep(0); }
+          };
+          el.addEventListener("click", handler);
+          bound.push([el, handler]);
+        });
+    }
+
+    return () => bound.forEach(([el, h]) => el.removeEventListener("click", h));
   }, []);
 
   useEffect(() => {
