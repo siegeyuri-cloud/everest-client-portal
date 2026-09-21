@@ -1,7 +1,7 @@
 <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;z-index:100;background:rgba(4,8,13,0.72);backdrop-filter:blur(6px);display:flex;justify-content:flex-end;">
       <div sc-camel-on-click="{{ close }}" style="position:absolute;inset:0;cursor:pointer;"></div>
-      <div style="position:relative;width:min(680px,100%);height:100%;background:var(--fl-night);border-left:1px solid rgba(192,149,81,0.3);overflow-y:auto;animation:flRise 320ms cubic-bezier(0.16,1,0.3,1);">
+      <div data-modal-panel role="dialog" aria-modal="true" style="position:relative;width:min(680px,100%);height:100%;background:var(--fl-night);border-left:1px solid rgba(192,149,81,0.3);overflow-y:auto;animation:flRise 320ms cubic-bezier(0.16,1,0.3,1);">
 
         <div style="position:sticky;top:0;z-index:5;background:rgba(11,21,33,0.96);backdrop-filter:blur(10px);border-bottom:1px solid rgba(192,149,81,0.2);padding:22px clamp(20px,4vw,44px);display:flex;align-items:center;justify-content:space-between;gap:20px;">
           <div style="display:flex;flex-direction:column;gap:7px;">

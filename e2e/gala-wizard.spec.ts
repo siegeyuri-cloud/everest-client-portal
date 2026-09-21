@@ -265,3 +265,35 @@ test("11. the seat door sends the plus-one as its own person", async ({ page }) 
   await page.getByRole("button", { name: "Done for now" }).click();
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
 });
+
+test("12. the modal takes focus, keeps it, and gives it back", async ({ page }) => {
+  const rsvp = page.locator('#gala-content [data-act="openDoors"]').first();
+  await rsvp.click();
+
+  // The panel marker has to survive prepare(), or the trap below is
+  // dead code that no other test would notice.
+  await expect(page.locator("[data-modal-panel]")).toHaveCount(1);
+  await expect(page.locator('[data-modal-panel][aria-modal="true"]')).toHaveCount(1);
+
+  // Focus moved into the modal rather than staying on the page button.
+  await expect
+    .poll(() => page.evaluate(() =>
+      document.activeElement?.closest("[data-modal-panel]") !== null
+        && document.activeElement?.closest("[data-modal-panel]") !== undefined))
+    .toBe(true);
+
+  // Twenty tabs cannot get out of it.
+  for (let i = 0; i < 20; i++) await page.keyboard.press("Tab");
+  expect(
+    await page.evaluate(() =>
+      document.activeElement?.closest("[data-modal-panel]") != null),
+  ).toBe(true);
+
+  // Escape closes, and focus goes back to the button that opened it.
+  await page.keyboard.press("Escape");
+  await expect(page.locator("[data-modal-panel]")).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      document.activeElement?.getAttribute("data-act")),
+  ).toBe("openDoors");
+});

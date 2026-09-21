@@ -477,13 +477,53 @@ export default function GalaWizard({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
+    // Where focus was before the modal took over, so it can go back.
+    const opener = document.activeElement as HTMLElement | null;
+
+    const panel = () =>
+      hostRef.current?.querySelector<HTMLElement>("[data-modal-panel]") ?? null;
+
+    const tabbable = () => {
+      const root = panel();
+      if (root === null) return [] as HTMLElement[];
+      return Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetParent !== null && !el.hasAttribute("disabled"));
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { close(); return; }
+      if (e.key !== "Tab") return;
+
+      // Keep Tab inside the modal. Without this the next Tab lands on
+      // the page behind, which a keyboard user cannot see past the
+      // overlay and cannot get back from.
+      const items = tabbable();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const here = document.activeElement;
+
+      if (!e.shiftKey && here === last) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && here === first) { e.preventDefault(); last.focus(); }
+      else if (here !== null && !panel()?.contains(here)) { e.preventDefault(); first.focus(); }
+    };
+
     document.addEventListener("keydown", onKey);
+
+    // Move focus in, so the first Tab goes somewhere sensible and a
+    // screen reader starts reading the modal rather than the page.
+    const t = window.setTimeout(() => { tabbable()[0]?.focus(); }, 0);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
+      window.clearTimeout(t);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
+      // Back to whatever they clicked to get here.
+      opener?.focus?.();
     };
   }, [open, close]);
 
