@@ -19,6 +19,9 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
     trace: "retain-on-failure",
+    // Registration tests write real rows. This stops them also sending
+    // real confirmation emails every run.
+    extraHTTPHeaders: { "x-pw-test": "1" },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {

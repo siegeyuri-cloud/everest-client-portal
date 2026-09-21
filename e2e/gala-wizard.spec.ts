@@ -223,3 +223,45 @@ test("10. the sponsor door carries the chosen tier's price into pay", async ({ p
   await page.getByRole("button", { name: "Done for now" }).click();
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
 });
+
+test("11. the seat door sends the plus-one as its own person", async ({ page }) => {
+  await page.locator('#gala-content [data-act="pickSeat"]').first().click();
+
+  // Two seats, so the guest step asks for a real second person.
+  await expect(modal(page)).toContainText("Step 1 of 6");
+  await page.locator('[data-act="setTwo"]').first().click();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  const stamp = Date.now();
+  await expect(modal(page)).toContainText("Step 2 of 6");
+  await page.locator('input[name="first"]').fill("Playwright");
+  await page.locator('input[name="last"]').fill("Seat");
+  await page.locator('input[name="mobile"]').fill("214-555-0155");
+  await page.locator('input[name="email"]').fill(`pwseat+${stamp}@everestcollective.com`);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // The plus-one has their own mobile and their own email on purpose.
+  await expect(modal(page)).toContainText("Step 3 of 6");
+  // The guest fields only appear once they say there is a guest.
+  await page.locator('[data-act="guestYes"]').first().click();
+  await page.locator('input[name="gFirst"]').fill("Plus");
+  await page.locator('input[name="gLast"]').fill("One");
+  await page.locator('input[name="gMobile"]').fill("214-555-0144");
+  await page.locator('input[name="gEmail"]').fill(`pwplus+${stamp}@everestcollective.com`);
+  // Their line, not the registrant's. The API refuses without it.
+  await page.locator('input[name="gLine"]').fill("Coaching a team through its first losing season");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 4 of 6");
+  await page.locator('input[name="line"]').fill("Buying the building the business rents");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 5 of 6");
+  await page.getByRole("button", { name: "Complete registration" }).click();
+
+  await expect(modal(page)).toContainText("Step 6 of 6", { timeout: 15000 });
+  await expect(modal(page)).toContainText("Seats");
+
+  await page.getByRole("button", { name: "Done for now" }).click();
+  await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
+});

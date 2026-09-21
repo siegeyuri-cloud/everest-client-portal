@@ -98,6 +98,10 @@ export async function POST(req: Request) {
   const door: Door | undefined = DOORS.includes(body?.door) ? body.door : undefined;
   if (!door) return fail("Please choose how you are joining us.", 400);
 
+  // Browser tests register real rows on purpose, but nobody needs the
+  // inbox full of them. The header only ever comes from Playwright.
+  const isTest = req.headers.get("x-pw-test") === "1";
+
   const email = String(body?.email ?? "").trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) {
     return fail("That email address does not look right.", 400);
@@ -212,13 +216,16 @@ export async function POST(req: Request) {
   // registration: the seat is real, and an unsent card shows up in the
   // admin table rather than disappearing.
   if (data?.status === "comped" && data?.registration_id) {
+    if (isTest) {
+      console.log("[gala/register] test run, no confirmation sent", data.reference);
+    } else
     sendGalaConfirmation(data.registration_id).catch((e) =>
       console.error("[gala/register] confirmation send threw", data.reference, e)
     );
   }
 
   // Tables and sponsorships interrupt people. Guests confirming do not.
-  if (data?.registration_id && (door === "host" || door === "sponsor")) {
+  if (!isTest && data?.registration_id && (door === "host" || door === "sponsor")) {
     notifyInternal(
       door === "host" ? "table_claimed" : "sponsor_committed",
       data.registration_id
