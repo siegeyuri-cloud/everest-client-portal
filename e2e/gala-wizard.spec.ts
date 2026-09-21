@@ -181,3 +181,45 @@ test("9. the host door registers and then shows what is owed", async ({ page }) 
   await page.getByRole("button", { name: "Done for now" }).click();
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
 });
+
+test("10. the sponsor door carries the chosen tier's price into pay", async ({ page }) => {
+  await page.locator('#gala-content [data-act="pickSponsor"]').first().click();
+
+  // Bronze is last, and cheap enough that the number on the pay screen
+  // is unambiguous about which tier was carried through.
+  await page.locator('[data-act^="tier:"]').last().click();
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  const stamp = Date.now();
+  await expect(modal(page)).toContainText("Step 2 of 7");
+  await page.locator('input[name="coLegal"]').fill(`PW Holdings ${stamp} LLC`);
+  // coRecog is required too: the legal name is for the invoice, this is
+  // the name that goes on the wall.
+  await page.locator('input[name="coRecog"]').fill(`PW Holdings ${stamp}`);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 3 of 7");
+  await page.locator('input[name="first"]').fill("Playwright");
+  await page.locator('input[name="last"]').fill("Sponsor");
+  await page.locator('input[name="mobile"]').fill("214-555-0188");
+  await page.locator('input[name="email"]').fill(`pwsponsor+${stamp}@everestcollective.com`);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 4 of 7");
+  await page.locator('input[name="line"]').fill("What a family holding company learned the hard way");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 5 of 7");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Review shows the tier they picked, not the first one in the list.
+  await expect(modal(page)).toContainText("Step 6 of 7");
+  await expect(modal(page)).toContainText("Bronze Sponsor");
+  await page.getByRole("button", { name: "Complete registration" }).click();
+
+  await expect(modal(page)).toContainText("Step 7 of 7", { timeout: 15000 });
+  await expect(modal(page)).toContainText("Sponsorship");
+
+  await page.getByRole("button", { name: "Done for now" }).click();
+  await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
+});

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { render, prepare } from "@/lib/gala/template";
 import {
   DOORS, YOU_HALF, YOU_FULL, GUEST_HALF, GUEST_FULL, COMPANY_FIELDS,
+  FIELD_TO_API, GUEST_FIELD_TO_API,
   type Field,
 } from "@/lib/gala/wizard-spec";
 
@@ -95,18 +96,34 @@ export default function GalaWizard({
   const submit = useCallback(async (f: Form) => {
     setSending(true);
     try {
-      const body: Record<string, unknown> = {
-        door,
-        first_name: (f.first ?? "").trim(),
-        last_name: (f.last ?? "").trim(),
-        email: (f.email ?? "").trim(),
-        mobile: (f.mobile ?? "").trim(),
-        badge_name: (f.badge ?? "").trim() || null,
-        dietary: (f.dietary ?? "").trim() || null,
-        accessibility: (f.access ?? "").trim() || null,
-        line: (f.line ?? "").trim(),
-      };
-      if (door === "guest") body.code = (f.code ?? "").trim();
+      // FIELD_TO_API is the single place the wizard's field names are
+      // mapped to the API's. Hand-listing them here is how the sponsor
+      // door ended up never sending its tier and failing every time.
+      const body: Record<string, unknown> = { door };
+      for (const [mine, theirs] of Object.entries(FIELD_TO_API)) {
+        const v = (f[mine] ?? "").trim();
+        if (v !== "") body[theirs] = v;
+      }
+
+      // The API identifies a tier by name, not by id.
+      const picked = tiers.find((t) => t.id === tierId) ?? null;
+      if (door === "sponsor" && picked !== null) {
+        body.tier_name = picked.name;
+        body.company_legal_name = (f.coLegal ?? "").trim();
+        body.company_recognition_name = (f.coRecog ?? "").trim();
+        const web = (f.coWeb ?? "").trim();
+        if (web !== "") body.website = web;
+      }
+
+      // The plus-one goes nested, and only when they said there is one.
+      if (door === "seat" && hasGuest === true) {
+        const guest: Record<string, string> = {};
+        for (const [mine, theirs] of Object.entries(GUEST_FIELD_TO_API)) {
+          const v = (f[mine] ?? "").trim();
+          if (v !== "") guest[theirs] = v;
+        }
+        body.plus_one = guest;
+      }
 
       const res = await fetch("/api/gala/register", {
         method: "POST",
@@ -131,7 +148,7 @@ export default function GalaWizard({
     } finally {
       setSending(false);
     }
-  }, [door]);
+  }, [door, tiers, tierId, hasGuest]);
 
   const steps = door ? DOORS[door].steps : [];
   const key = door && step >= 0 && step < steps.length ? steps[step] : null;
