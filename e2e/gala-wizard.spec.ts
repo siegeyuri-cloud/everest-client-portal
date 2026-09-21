@@ -163,8 +163,17 @@ test("9. the host door registers and then shows what is owed", async ({ page }) 
   await page.locator('input[name="line"]').fill("Why the family firm still argues about 1998");
   await page.getByRole("button", { name: "Continue" }).click();
 
-  // Roster is step 4 and is skippable by design.
+  // Roster is step 4 and is skippable, but fill two rows: one complete,
+  // one name-only. Both should reach the API, and a partial row is a
+  // real case since hosts often know a name before an address.
   await expect(modal(page)).toContainText("Step 4 of 6");
+  await page.locator('input[name="rosterName0"]').fill(`Alpha ${stamp}`);
+  await page.locator('input[name="rosterEmail0"]').fill(`pwalpha+${stamp}@everestcollective.com`);
+  await page.locator('input[name="rosterName1"]').fill(`Beta ${stamp}`);
+  // No assertion on "n of 9 named" here: it reads from form, which only
+  // updates on Continue, so it stays at 0 while you type. The modal is
+  // one innerHTML blob, so re-rendering per keystroke would eat the
+  // cursor. The count is stale by design, not broken.
   await page.getByRole("button", { name: "Continue" }).click();
 
   await expect(modal(page)).toContainText("Step 5 of 6");

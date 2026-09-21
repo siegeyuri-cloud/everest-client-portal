@@ -85,6 +85,7 @@ export default function GalaWizard({
   const [rosterByEmail, setRosterByEmail] = useState(true);
   const [tierId, setTierId] = useState<string | null>(null);
   const [codeInfo, setCodeInfo] = useState<CodeInfo>(null);
+  const [hostCode, setHostCode] = useState<string | null>(null);
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
   const [sending, setSending] = useState(false);
@@ -109,10 +110,13 @@ export default function GalaWizard({
       const picked = tiers.find((t) => t.id === tierId) ?? null;
       if (door === "sponsor" && picked !== null) {
         body.tier_name = picked.name;
-        body.company_legal_name = (f.coLegal ?? "").trim();
-        body.company_recognition_name = (f.coRecog ?? "").trim();
+        const company: Record<string, string> = {
+          legal_name: (f.coLegal ?? "").trim(),
+          recognition_name: (f.coRecog ?? "").trim(),
+        };
         const web = (f.coWeb ?? "").trim();
-        if (web !== "") body.website = web;
+        if (web !== "") company.website_url = web;
+        body.company = company;
       }
 
       // The plus-one goes nested, and only when they said there is one.
@@ -123,6 +127,22 @@ export default function GalaWizard({
           if (v !== "") guest[theirs] = v;
         }
         body.plus_one = guest;
+      }
+
+      // The roster becomes invitations. Rows the host left blank are
+      // skipped; they can come back and finish later.
+      if (door === "host" || door === "sponsor") {
+        const roster: Array<{ name?: string; email?: string }> = [];
+        for (let i = 0; i < 20; i++) {
+          const nm = (f[`rosterName${i}`] ?? "").trim();
+          const em = (f[`rosterEmail${i}`] ?? "").trim();
+          if (nm === "" && em === "") continue;
+          const entry: { name?: string; email?: string } = {};
+          if (nm !== "") entry.name = nm;
+          if (em !== "") entry.email = em;
+          roster.push(entry);
+        }
+        if (roster.length > 0) body.roster = roster;
       }
 
       const res = await fetch("/api/gala/register", {
@@ -144,6 +164,7 @@ export default function GalaWizard({
       setToken(res.data.ticket_token ?? null);
       setAmountCents(res.data.amount_cents ?? 0);
       setComped(res.data.status === "comped");
+      setHostCode(res.data.host_code ?? null);
       return true;
     } finally {
       setSending(false);
