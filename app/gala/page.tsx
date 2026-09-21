@@ -36,6 +36,10 @@ type TierRow = {
   id: string;
   name: string;
   amount_cents: number;
+  // How many seats the tier actually buys. seats_label is the prose
+  // version for the page; this is the number the wizard needs when it
+  // builds a sponsor's roster.
+  seat_count: number;
   seats_label: string;
   recognition: string;
   cap: number | null;
@@ -92,6 +96,29 @@ export default async function GalaPage() {
       availability:
         left == null ? "Available" : left === 0 ? "No longer available" : `${left} remaining`,
       availColor: left === 0 ? "rgba(244,238,226,0.45)" : "var(--fl-gold)",
+
+      // The wizard renders the same rows as choosable cards, so the
+      // fields it needs are added here rather than computed a second
+      // time. Two copies of this arithmetic is how the page and the
+      // modal end up disagreeing about what is still for sale.
+      id: t.id,
+      amountCents: t.amount_cents,
+      seatCount: t.seat_count,
+      soldOut: left === 0,
+      // Parsed by the wizard's click listener. Sold out tiers carry no
+      // action at all, so the button cannot be chosen.
+      pick: left === 0 ? "" : `tier:${t.id}`,
+      cursor: left === 0 ? "not-allowed" : "pointer",
+      nameColor: left === 0 ? "rgba(244,238,226,0.45)" : "var(--fl-ivory)",
+      // Who already holds a capped tier. Uncapped tiers list nobody,
+      // because "taken by" on an unlimited tier reads as a warning.
+      takenList:
+        t.cap == null
+          ? ""
+          : sponsors
+              .filter((sp) => sp.tier_id === t.id && sp.show_on_wall)
+              .map((sp) => sp.recognition_name || sp.legal_name)
+              .join(", "),
     };
   });
 
