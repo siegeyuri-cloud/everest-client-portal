@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabaseService";
+import { sendGalaConfirmation } from "@/lib/gala/email";
+import { notifyInternal } from "@/lib/gala/notify";
 
 /**
  * POST /api/gala/register — completes a gala registration.
@@ -203,6 +205,24 @@ export async function POST(req: Request) {
     } else {
       ticketToken = issued.token ?? null;
     }
+  }
+
+  // The card goes out for anyone already confirmed. Payers get theirs from
+  // the webhook once the money lands. Failure here never fails the
+  // registration: the seat is real, and an unsent card shows up in the
+  // admin table rather than disappearing.
+  if (data?.status === "comped" && data?.registration_id) {
+    sendGalaConfirmation(data.registration_id).catch((e) =>
+      console.error("[gala/register] confirmation send threw", data.reference, e)
+    );
+  }
+
+  // Tables and sponsorships interrupt people. Guests confirming do not.
+  if (data?.registration_id && (door === "host" || door === "sponsor")) {
+    notifyInternal(
+      door === "host" ? "table_claimed" : "sponsor_committed",
+      data.registration_id
+    ).catch((e) => console.error("[gala/register] notify threw", e));
   }
 
   return NextResponse.json({ ok: true, data: { ...data, ticket_token: ticketToken } });

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabaseService";
 import { verifyWebhookSignature, extractOrder, ttConfig } from "@/lib/tickettailor";
+import { sendGalaConfirmationGroup } from "@/lib/gala/email";
+import { notifyInternal } from "@/lib/gala/notify";
 
 /**
  * POST /api/gala/webhooks/tickettailor
@@ -127,6 +129,17 @@ export async function POST(req: Request) {
   }
 
   const matched = result?.matched === true;
+
+  // Money landed, so the buyer and their plus-one are now confirmed and
+  // should hear from us. Skipped on a replay, since the card already went.
+  if (matched && !result?.already_applied && result?.registration_id) {
+    sendGalaConfirmationGroup(result.registration_id).catch((e) =>
+      console.error("[gala/webhook] confirmation send threw", result.reference, e)
+    );
+    notifyInternal("payment_received", result.registration_id).catch((e) =>
+      console.error("[gala/webhook] notify threw", e)
+    );
+  }
 
   await supabase
     .from("gala_orders")
