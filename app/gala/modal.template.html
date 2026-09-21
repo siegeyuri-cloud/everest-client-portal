@@ -1,0 +1,791 @@
+<sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:100;background:rgba(4,8,13,0.72);backdrop-filter:blur(6px);display:flex;justify-content:flex-end;">
+      <div sc-camel-on-click="{{ close }}" style="position:absolute;inset:0;cursor:pointer;"></div>
+      <div style="position:relative;width:min(680px,100%);height:100%;background:var(--fl-night);border-left:1px solid rgba(192,149,81,0.3);overflow-y:auto;animation:flRise 320ms cubic-bezier(0.16,1,0.3,1);">
+
+        <div style="position:sticky;top:0;z-index:5;background:rgba(11,21,33,0.96);backdrop-filter:blur(10px);border-bottom:1px solid rgba(192,149,81,0.2);padding:22px clamp(20px,4vw,44px);display:flex;align-items:center;justify-content:space-between;gap:20px;">
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="font-size:10px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">{{ doorLabel }}</div>
+            <div style="font-size:12px;font-weight:300;letter-spacing:0.14em;text-transform:uppercase;color:rgba(244,238,226,0.66);">{{ stepLabel }}</div>
+          </div>
+          <button sc-camel-on-click="{{ close }}" style="background:none;border:1px solid rgba(192,149,81,0.35);color:rgba(244,238,226,0.7);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;padding:10px 16px;cursor:pointer;">Close</button>
+        </div>
+
+        <div style="height:2px;background:rgba(244,238,226,0.08);">
+          <div style="height:2px;background:var(--fl-gold);width:{{ progress }};transition:width 300ms cubic-bezier(0.16,1,0.3,1);"></div>
+        </div>
+
+        <div style="padding:clamp(28px,4vw,44px) clamp(20px,4vw,44px) 56px;">
+
+          <sc-if value="{{ atDoors }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:22px;">
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">How are you joining us?</h3>
+              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.55;color:rgba(244,238,226,0.68);">Pick the one that fits and we will only ask for what we need.</p>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+                <button sc-camel-on-click="{{ pickSeat }}" style="text-align:left;background:rgba(244,238,226,0.04);border:1px solid rgba(192,149,81,0.25);padding:22px 24px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.08);border-color:rgba(192,149,81,0.55);">
+                  <span style="font-family:'Marcellus',Georgia,serif;font-size:21px;color:var(--fl-ivory);">I want to buy a seat</span>
+                  <span style="font-size:12.5px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.55);">$250 each, one or two.</span>
+                </button>
+                <button sc-camel-on-click="{{ pickHost }}" style="text-align:left;background:rgba(244,238,226,0.04);border:1px solid rgba(192,149,81,0.25);padding:22px 24px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.08);border-color:rgba(192,149,81,0.55);">
+                  <span style="font-family:'Marcellus',Georgia,serif;font-size:21px;color:var(--fl-ivory);">I want to host a table</span>
+                  <span style="font-size:12.5px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.55);">Ten seats, and we help you fill them.</span>
+                </button>
+                <button sc-camel-on-click="{{ pickGuest }}" style="text-align:left;background:rgba(244,238,226,0.04);border:1px solid rgba(192,149,81,0.25);padding:22px 24px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.08);border-color:rgba(192,149,81,0.55);">
+                  <span style="font-family:'Marcellus',Georgia,serif;font-size:21px;color:var(--fl-ivory);">I was invited by a table host</span>
+                  <span style="font-size:12.5px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.55);">You have a code, or we invited you.</span>
+                </button>
+                <button sc-camel-on-click="{{ pickSponsor }}" style="text-align:left;background:rgba(244,238,226,0.04);border:1px solid rgba(192,149,81,0.25);padding:22px 24px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.08);border-color:rgba(192,149,81,0.55);">
+                  <span style="font-family:'Marcellus',Georgia,serif;font-size:21px;color:var(--fl-ivory);">We want to sponsor</span>
+                  <span style="font-size:12.5px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.55);">Tiers, logo placement, seats.</span>
+                </button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showCode }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:20px;">
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Your invitation code</h3>
+              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.55;color:rgba(244,238,226,0.68);">It is printed on your invitation and it is in the text your host sent you. It looks like COLLECTIVE-MIKE.</p>
+              <input type="text" name="code" value="{{ vCode }}" sc-camel-on-change="{{ onField }}" placeholder="COLLECTIVE-" autocomplete="off" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.35);color:var(--fl-ivory);font-size:22px;letter-spacing:0.12em;text-transform:uppercase;padding:20px 22px;outline:none;">
+              <sc-if value="{{ errCode }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errCode }}</div>
+              </sc-if>
+              <sc-if value="{{ codePreview }}" hint-placeholder-val="{{ false }}">
+                <div style="border-left:2px solid var(--fl-gold);padding:4px 0 4px 14px;font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.5;color:rgba(244,238,226,0.8);">{{ codePreview }}</div>
+              </sc-if>
+              <p style="margin:0;font-size:13px;font-weight:300;line-height:1.65;color:rgba(244,238,226,0.66);">Lost the code? Ask your host, or write to Reign.Bach@everestcollective.com and we will look you up.</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showSeats }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:22px;">
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">How many seats</h3>
+              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.55;color:rgba(244,238,226,0.68);">$250 a seat. Two is the maximum for an individual registration, and if you want more than that, host a table.</p>
+              <div style="display:flex;gap:12px;">
+                <button sc-camel-on-click="{{ setOne }}" style="flex:1;background:{{ seatOneBg }};border:1px solid {{ seatOneBorder }};color:{{ seatOneColor }};font-size:15px;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;padding:22px;cursor:pointer;transition:all 200ms cubic-bezier(0.16,1,0.3,1);">One seat</button>
+                <button sc-camel-on-click="{{ setTwo }}" style="flex:1;background:{{ seatTwoBg }};border:1px solid {{ seatTwoBorder }};color:{{ seatTwoColor }};font-size:15px;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;padding:22px;cursor:pointer;transition:all 200ms cubic-bezier(0.16,1,0.3,1);">Two seats</button>
+              </div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;border-top:1px solid rgba(192,149,81,0.25);padding-top:20px;">
+                <span style="font-size:11px;font-weight:400;letter-spacing:0.24em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Total today</span>
+                <span style="font-family:'Marcellus',Georgia,serif;font-size:34px;color:var(--fl-gold);">{{ seatTotal }}</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showTable }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:22px;">
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Claim your table</h3>
+              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.55;color:rgba(244,238,226,0.68);">A table seats ten, including you. Once you claim it we send you the invitation image, the text to send with it, and your own invitation code so every guest who registers is credited to you.</p>
+              <div style="border:1px solid rgba(192,149,81,0.28);padding:26px;display:flex;flex-direction:column;gap:16px;">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;">
+                  <span style="font-size:14px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.8);">Table of ten</span>
+                  <span style="font-family:'Marcellus',Georgia,serif;font-size:28px;color:var(--fl-gold);">$2,500</span>
+                </div>
+                <div style="font-size:12px;font-weight:300;line-height:1.6;letter-spacing:0.04em;color:rgba(244,238,226,0.66);">Ten seats at $250. The proceeds are donated to Pregnancy Help 4 U.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Name the table will be listed under</span>
+                <input type="text" name="tableName" value="{{ vTableName }}" sc-camel-on-change="{{ onField }}" placeholder="Fromhold Family, or Everest Collective" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.3);color:var(--fl-ivory);font-size:16px;padding:16px 18px;outline:none;">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showTier }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:22px;">
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Choose a tier</h3>
+              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.55;color:rgba(244,238,226,0.68);">Amounts are placeholders until the committee signs off. If you are looking at the top two, call instead and we will build it around you.</p>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <sc-for list="{{ tierChoices }}" as="t" hint-placeholder-count="4">
+                  <button sc-camel-on-click="{{ t.pick }}" style="text-align:left;background:{{ t.bg }};border:1px solid {{ t.border }};padding:22px 24px;cursor:{{ t.cursor }};display:flex;flex-direction:column;gap:12px;transition:all 200ms cubic-bezier(0.16,1,0.3,1);">
+                    <span style="width:100%;display:flex;align-items:baseline;justify-content:space-between;gap:20px;">
+                      <span style="font-family:'Marcellus',Georgia,serif;font-size:21px;color:{{ t.nameColor }};">{{ t.name }}</span>
+                      <span style="flex:none;font-size:17px;font-weight:400;letter-spacing:0.06em;color:var(--fl-gold);">{{ t.amount }}</span>
+                    </span>
+                    <span style="font-size:12.5px;font-weight:300;letter-spacing:0.05em;line-height:1.55;color:rgba(244,238,226,0.62);">{{ t.seats }} &nbsp;·&nbsp; {{ t.recognition }}</span>
+                    <span style="width:100%;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(192,149,81,0.18);padding-top:11px;">
+                      <span style="font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:{{ t.availColor }};">{{ t.availability }}</span>
+                      <sc-if value="{{ t.takenList }}" hint-placeholder-val="{{ false }}">
+                        <span style="min-width:0;font-size:11.5px;font-weight:300;letter-spacing:0.04em;color:rgba(244,238,226,0.66);">Taken by {{ t.takenList }}</span>
+                      </sc-if>
+                    </span>
+                  </button>
+                </sc-for>
+              </div>
+              <sc-if value="{{ errTier }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errTier }}</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showCompany }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:26px;">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Your company</h3>
+                <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(244,238,226,0.68);">The recognition name is the one that matters. We print exactly what you type, so if the legal name has an LLC on the end and you would rather it did not appear, say so here.</p>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:20px;">
+                <sc-for list="{{ companyFields }}" as="f" hint-placeholder-count="3">
+                  <label style="display:flex;flex-direction:column;gap:9px;">
+                    <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.62);">{{ f.label }}</span>
+                    <input type="text" name="{{ f.name }}" value="{{ f.value }}" sc-camel-on-change="{{ onField }}" placeholder="{{ f.ph }}" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid {{ f.border }};color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;">
+                    <sc-if value="{{ f.hint }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size:12px;font-weight:300;line-height:1.55;color:rgba(244,238,226,0.66);">{{ f.hint }}</span>
+                    </sc-if>
+                  </label>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.62);">Your logo</span>
+                <div style="width:100%;height:200px;border:1px dashed rgba(192,149,81,0.45);padding:14px;">
+                  <image-slot id="sponsor-logo-upload" shape="rect" fit="contain" placeholder="Drop a logo, PNG or SVG with a transparent background"></image-slot>
+                </div>
+                <span style="font-size:12px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.66);">Vector or a PNG at least 1200px wide. We will come back to you if it will not hold up on the screen at the front of the room.</span>
+              </div>
+              <sc-if value="{{ errCompany }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errCompany }}</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showRoster }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:24px;">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">{{ rosterLabel }}</h3>
+                <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(244,238,226,0.68);">You have {{ rosterN }} seats to fill besides your own. Fill in what you know now and come back for the rest, and every guest registers themselves so we get their own mobile, their own dietary notes, and their own line for the badge.</p>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.62);">How should we get the invitations out?</span>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;">
+                  <button sc-camel-on-click="{{ setEmailMode }}" style="flex:1 1 160px;text-align:left;background:{{ emailModeBg }};border:1px solid {{ emailModeBorder }};padding:18px 20px;cursor:pointer;display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-family:'Marcellus',Georgia,serif;font-size:18px;color:var(--fl-ivory);">Email them for me</span>
+                    <span style="font-size:12px;font-weight:300;line-height:1.5;color:rgba(244,238,226,0.6);">Give us an address and we send the invitation and their code.</span>
+                  </button>
+                  <button sc-camel-on-click="{{ setCodeMode }}" style="flex:1 1 160px;text-align:left;background:{{ codeModeBg }};border:1px solid {{ codeModeBorder }};padding:18px 20px;cursor:pointer;display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-family:'Marcellus',Georgia,serif;font-size:18px;color:var(--fl-ivory);">Give me the codes</span>
+                    <span style="font-size:12px;font-weight:300;line-height:1.5;color:rgba(244,238,226,0.6);">You text them yourself, with the invitation image.</span>
+                  </button>
+                </div>
+              </div>
+
+              <div style="border:1px solid rgba(192,149,81,0.22);">
+                <sc-for list="{{ rosterRows }}" as="r" hint-placeholder-count="9">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(192,149,81,0.12);">
+                    <span style="flex:none;width:22px;font-family:'Marcellus',Georgia,serif;font-size:15px;color:rgba(244,238,226,0.66);">{{ r.n }}</span>
+                    <input type="text" value="{{ r.name }}" sc-camel-on-change="{{ r.onName }}" placeholder="Guest name" style="flex:1 1 130px;min-width:0;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:15px;padding:13px 14px;outline:none;">
+                    <sc-if value="{{ rosterByEmail }}" hint-placeholder-val="{{ true }}">
+                      <input type="email" value="{{ r.email }}" sc-camel-on-change="{{ r.onEmail }}" placeholder="Their email" style="flex:1 1 150px;min-width:0;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:15px;padding:13px 14px;outline:none;">
+                    </sc-if>
+                    <sc-if value="{{ showCodes }}" hint-placeholder-val="{{ false }}">
+                      <span style="flex:1 1 150px;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;letter-spacing:0.04em;color:var(--fl-gold);word-break:break-all;">{{ r.code }}</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+                <span style="font-size:12px;font-weight:400;letter-spacing:0.16em;text-transform:uppercase;color:rgba(244,238,226,0.6);">{{ rosterFilled }} of {{ rosterN }} named</span>
+                <span style="font-size:12.5px;font-weight:300;letter-spacing:0.04em;color:rgba(244,238,226,0.55);">You can leave this and finish later</span>
+              </div>
+              <sc-if value="{{ errRoster }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errRoster }}</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showYou }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:26px;">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">About you</h3>
+                <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(244,238,226,0.65);">This is what goes on your badge, your table card, and the guest list. Nothing else.</p>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:20px;">
+                <sc-for list="{{ youHalf }}" as="f" hint-placeholder-count="6">
+                  <label style="display:flex;flex-direction:column;gap:9px;">
+                    <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">{{ f.label }}</span>
+                    <input type="text" name="{{ f.name }}" value="{{ f.value }}" sc-camel-on-change="{{ onField }}" placeholder="{{ f.ph }}" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid {{ f.border }};color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;">
+                  </label>
+                </sc-for>
+                <sc-for list="{{ youFull }}" as="f" hint-placeholder-count="3">
+                  <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:9px;">
+                    <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">{{ f.label }}</span>
+                    <input type="text" name="{{ f.name }}" value="{{ f.value }}" sc-camel-on-change="{{ onField }}" placeholder="{{ f.ph }}" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid {{ f.border }};color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;">
+                    <sc-if value="{{ f.hint }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size:12px;font-weight:300;line-height:1.55;color:rgba(244,238,226,0.66);">{{ f.hint }}</span>
+                    </sc-if>
+                  </label>
+                </sc-for>
+                <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:9px;">
+                  <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Table host, if you know</span>
+                  <sc-raw-select name="host" value="{{ vHost }}" sc-camel-on-change="{{ onField }}" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.3);color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;appearance:none;">
+                    <sc-for list="{{ hostOptions }}" as="h" hint-placeholder-count="3">
+                      <option value="{{ h }}" style="background:#0B1521;color:#F4EEE2;">{{ h }}</option>
+                    </sc-for>
+                  </sc-raw-select>
+                </label>
+              </div>
+              <sc-if value="{{ errYou }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errYou }}</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showGuest }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:26px;">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Bringing someone?</h3>
+                <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(244,238,226,0.65);">If you are, we need your guest's own mobile and email. We text them one question, they answer it in thirty seconds, and their badge says something true instead of something you guessed at a red light.</p>
+              </div>
+              <div style="display:flex;gap:12px;">
+                <button sc-camel-on-click="{{ guestYes }}" style="flex:1;background:{{ gYesBg }};border:1px solid {{ gYesBorder }};color:{{ gYesColor }};font-size:14px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:20px;cursor:pointer;transition:all 200ms cubic-bezier(0.16,1,0.3,1);">Yes, one guest</button>
+                <button sc-camel-on-click="{{ guestNo }}" style="flex:1;background:{{ gNoBg }};border:1px solid {{ gNoBorder }};color:{{ gNoColor }};font-size:14px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;padding:20px;cursor:pointer;transition:all 200ms cubic-bezier(0.16,1,0.3,1);">Coming alone</button>
+              </div>
+              <sc-if value="{{ hasGuest }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:20px;animation:flRise 300ms cubic-bezier(0.16,1,0.3,1);">
+                  <sc-for list="{{ guestHalf }}" as="f" hint-placeholder-count="4">
+                    <label style="display:flex;flex-direction:column;gap:9px;">
+                      <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">{{ f.label }}</span>
+                      <input type="text" name="{{ f.name }}" value="{{ f.value }}" sc-camel-on-change="{{ onField }}" placeholder="{{ f.ph }}" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid {{ f.border }};color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;">
+                    </label>
+                  </sc-for>
+                  <sc-for list="{{ guestFull }}" as="f" hint-placeholder-count="2">
+                    <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:9px;">
+                      <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">{{ f.label }}</span>
+                      <input type="text" name="{{ f.name }}" value="{{ f.value }}" sc-camel-on-change="{{ onField }}" placeholder="{{ f.ph }}" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid {{ f.border }};color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;">
+                    </label>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ hasGuest }}" hint-placeholder-val="{{ false }}">
+                <label style="display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(192,149,81,0.2);padding-top:22px;">
+                  <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.5;color:rgba(244,238,226,0.84);">What could your guest talk about for an hour without any notes?</span>
+                  <input type="text" name="gLine" value="{{ vGuestLine }}" sc-camel-on-change="{{ onField }}" sc-camel-max-length="60" placeholder="Their answer, not yours" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.4);color:var(--fl-ivory);font-size:17px;padding:16px 18px;outline:none;">
+                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.55);">This goes on their badge and their table card. If you are guessing, hand them your phone.</span>
+                </label>
+              </sc-if>
+              <sc-if value="{{ errGuest }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errGuest }}</div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showConnect }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:24px;">
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <div style="font-size:10px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:var(--fl-gold);">One question, and it matters</div>
+                <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.2;color:var(--fl-ivory);">What could you talk about for an hour without any notes?</h3>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <input type="text" name="line" value="{{ vLine }}" sc-camel-on-change="{{ onField }}" maxlength="60" placeholder="Restoring a 1968 Bronco" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid {{ lineBorder }};color:var(--fl-ivory);font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;padding:19px 21px;outline:none;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;">
+                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.66);">Be specific. This will appear on your name badge and your table card, and someone is going to walk up and ask you about it.</span>
+                  <span style="flex:none;font-size:12px;letter-spacing:0.1em;color:{{ countColor }};">{{ lineCount }}</span>
+                </div>
+              </div>
+              <sc-if value="{{ errLine }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errLine }}</div>
+              </sc-if>
+
+              <div style="margin-top:14px;padding-top:28px;border-top:1px solid rgba(192,149,81,0.22);display:flex;flex-direction:column;gap:12px;">
+                <div style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Optional, and never printed</div>
+                <label style="display:flex;flex-direction:column;gap:12px;">
+                  <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;line-height:1.5;color:rgba(244,238,226,0.82);">Is there anyone you would like to meet at this event, or a kind of person you would like to be seated near?</span>
+                  <input type="text" name="seatNear" value="{{ vSeatNear }}" sc-camel-on-change="{{ onField }}" placeholder="Someone in commercial real estate, or the Whitmores" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;">
+                </label>
+                <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.66);">This one is for the seating chart. Nobody sees it but us.</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showReview }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:24px;">
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Check it over</h3>
+              <div style="border:1px solid rgba(192,149,81,0.25);">
+                <sc-for list="{{ summary }}" as="s" hint-placeholder-count="6">
+                  <div style="display:grid;grid-template-columns:minmax(96px,180px) 1fr;gap:20px;padding:17px 24px;border-bottom:1px solid rgba(192,149,81,0.14);">
+                    <span style="font-size:10.5px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,238,226,0.66);padding-top:3px;">{{ s.k }}</span>
+                    <span style="font-size:15.5px;font-weight:300;letter-spacing:0.02em;color:rgba(244,238,226,0.9);">{{ s.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showPay }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:24px;">
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Payment</h3>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;border:1px solid rgba(192,149,81,0.3);padding:24px 26px;">
+                <span style="font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.55);">{{ payLabel }}</span>
+                <span style="font-family:'Marcellus',Georgia,serif;font-size:34px;color:var(--fl-gold);">{{ payAmount }}</span>
+              </div>
+              <div style="border:1px dashed rgba(192,149,81,0.45);background:rgba(192,149,81,0.05);padding:30px 26px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Checkout embeds here</span>
+                <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.55;color:rgba(244,238,226,0.62);max-width:400px;">Checkout runs in Everest Collective's name, because this is an Everest Collective event. Everything collected here is donated to Pregnancy Help 4 U.</span>
+              </div>
+              <p style="margin:0;font-size:12.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.66);">This is a payment for admission to an Everest Collective event, not a charitable contribution, so no tax receipt will be issued for it. Nothing is held until payment clears. Registration closes November 16 and the seating chart is built the week after, which is why the date is hard.</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showDone }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:24px;align-items:center;text-align:center;padding-top:20px;">
+              <div style="line-height:0;">
+                <svg width="220" height="30" sc-camel-view-box="0 0 220 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 27 Q110 -6 218 27" stroke="var(--fl-gold)" stroke-width="1.3" fill="none" stroke-linecap="round"></path></svg>
+              </div>
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:44px;line-height:1.1;letter-spacing:0.03em;color:var(--fl-ivory);">You are in</h3>
+              <p style="margin:0;max-width:440px;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.6;color:rgba(244,238,226,0.72);">A confirmation is on its way to {{ doneEmail }}. Your badge will read {{ doneLine }}, so expect a stranger to walk up and ask about it.</p>
+              <sc-if value="{{ isComp }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;max-width:440px;font-size:13.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.62);">Your seat is complimentary and there is nothing to pay. We are placing you ourselves rather than at a host table, so your table number arrives with your ticket.</p>
+              </sc-if>
+              <sc-if value="{{ hasGuest }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;max-width:440px;font-size:13.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.6);">We are texting {{ doneGuest }} one question. It takes thirty seconds and it is the difference between a badge that starts a conversation and one that wastes the ink.</p>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;width:100%;max-width:340px;">
+                <a href="{{ calendarUrl }}" style="background:var(--fl-gold);color:#0B1521;font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:18px;text-align:center;">Add to calendar</a>
+                <button sc-camel-on-click="{{ close }}" style="background:none;border:1px solid rgba(192,149,81,0.4);color:rgba(244,238,226,0.75);font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;padding:17px;cursor:pointer;">Back to the page</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showNav }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:40px;padding-top:28px;border-top:1px solid rgba(192,149,81,0.2);display:flex;align-items:center;justify-content:space-between;gap:20px;">
+              <button sc-camel-on-click="{{ back }}" style="background:none;border:none;color:rgba(244,238,226,0.55);font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;padding:14px 0;cursor:pointer;">Back</button>
+              <button sc-camel-on-click="{{ next }}" style="background:var(--fl-gold);color:#0B1521;border:none;font-size:11.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:18px 40px;cursor:pointer;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:#D4AF6A;">{{ nextLabel }}</button>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;ordinal&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Inaugural&quot;,&quot;options&quot;:[&quot;Inaugural&quot;,&quot;Second&quot;,&quot;Third&quot;,&quot;Fourth&quot;,&quot;Fifth&quot;,&quot;Sixth&quot;,&quot;Seventh&quot;,&quot;Eighth&quot;,&quot;Ninth&quot;,&quot;Tenth&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Identity&quot;},&quot;ph4uUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://pregnancyhelp4u.org&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Registration&quot;,&quot;label&quot;:&quot;Pregnancy Help 4 U website&quot;},&quot;tableHosts&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Registration&quot;,&quot;label&quot;:&quot;Table host names, comma separated&quot;},&quot;onepagerUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;#sponsor&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Registration&quot;,&quot;label&quot;:&quot;Sponsorship one-pager PDF url&quot;},&quot;mapUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://www.google.com/maps/search/?api=1&amp;query=The+Reserve+at+Marty+B%27s+Bartonville+TX&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Registration&quot;},&quot;calendarUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://thecollectivegala.com/the-collective.ics&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Registration&quot;},&quot;goldTone&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#C09551&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#C09551&quot;,&quot;#B8873C&quot;,&quot;#CDAE72&quot;,&quot;#D9BE7E&quot;],&quot;section&quot;:&quot;Identity&quot;},&quot;dawnGlow&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:55,&quot;min&quot;:0,&quot;max&quot;:100,&quot;step&quot;:5,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Identity&quot;}}">
+const DOORS = {
+  guest:   { label: 'Invited guest',     steps: ['code','you','connect','review'] },
+  seat:    { label: 'Individual seat',   steps: ['seats','you','guest','connect','review','pay'] },
+  host:    { label: 'Table host',        steps: ['table','you','connect','roster','review','pay'] },
+  sponsor: { label: 'Corporate sponsor', steps: ['tier','company','you','connect','roster','review','pay'] }
+};
+
+const TIERS = [
+  { name:'Presenting Sponsor', amount:'$15,000', value:15000, cap:1, seatCount:10,
+    seats:'10 seats, one table', recognition:'Name on the evening, remarks from the stage, largest logo on every piece',
+    taken:[{ company:'Whitmore Land & Cattle', slot:'sp-pres-1' }] },
+  { name:'Gold Sponsor', amount:'$7,500', value:7500, cap:3, seatCount:10,
+    seats:'10 seats, one table', recognition:'Recognition from the stage, logo on the program and the screen',
+    taken:[{ company:'Reed Orthopedics', slot:'sp-gold-1' }, { company:'Delgado & Vance', slot:'sp-gold-2' }] },
+  { name:'Silver Sponsor', amount:'$2,500', value:2500, cap:null, seatCount:4,
+    seats:'4 seats', recognition:'Logo on the program and the screen',
+    taken:[{ company:'Bartonville Title' }, { company:'Chen Capital Partners' }, { company:'Halcyon Air' }] },
+  { name:'Bronze Sponsor', amount:'$1,000', value:1000, cap:null, seatCount:2,
+    seats:'2 seats', recognition:'Name in the program',
+    taken:[{ company:'Kestrel Dental' }, { company:'North Loop Coffee' }, { company:'Vance & Sons Ironwork' }, { company:'Trinity Vet Clinic' }] }
+];
+
+const CAPACITY = 300;
+const SEATS_TAKEN = 204;
+
+const CODES = {
+  'COLLECTIVE-MIKE':     { host:'Mike Fromhold',   table:'4',  seats:10, used:3 },
+  'COLLECTIVE-SARAH':    { host:'Sarah Whitmore',  table:'12', seats:10, used:7 },
+  'COLLECTIVE-BRITTANY': { host:'Brittany Tipton', table:'9',  seats:10, used:10 },
+  'COLLECTIVE-REED':     { host:'Marcus Reed',     table:'3',  seats:10, used:5 },
+  'COLLECTIVE-VIP-0114': { vip:true, invitedBy:'Everest Collective' },
+  'COLLECTIVE-VIP-0207': { vip:true, invitedBy:'Everest Collective' }
+};
+
+const FAQS = [
+  { q: 'Is my ticket tax deductible?',
+    a: 'No, and we would rather say that plainly than let you find out in April. Your ticket is a payment for admission to an Everest Collective event, not a gift to the charity, so there is no charitable receipt for it. What happens instead is that Everest Collective pays for the venue and the set up costs, and 100% of the proceeds from the event are donated to Pregnancy Help 4 U. If you want a deductible gift, give to PH4U directly and they will receipt you.' },
+  { q: 'Can I bring additional guests?',
+    a: 'Yes, of course. Tickets are $250 apiece, so add a seat for each person you are bringing when you register. If you need more than a few, host a table, and if a table is more than you need, write to us and we will find the seats.' },
+  { q: 'What if my plans change?',
+    a: 'Tell us before November 16 and we will release your seat to someone on the list. After that the dinner is already bought and the seating chart is already built, so the seat stays yours, and what you paid is still donated to Pregnancy Help 4 U.' },
+  { q: 'Can I donate without attending?',
+    a: 'Yes, and that one is deductible. Give to Pregnancy Help 4 U directly, they receipt you, and you never have to put on a tuxedo.' },
+  { q: 'Is there a dress code minimum?',
+    a: 'Black tie with a Texas accent. Tuxedos and gowns, and boots are welcome. If you own a dinner jacket that only comes out once a year, this is the night.' },
+  { q: 'Who do I contact?',
+    a: 'Write to Reign.Bach@everestcollective.com or call the number in the footer. A person answers, and it is usually the same day.' }
+];
+
+const YOU_HALF = [
+  { name:'first',   label:'First name',  ph:'David',            req:true },
+  { name:'last',    label:'Last name',   ph:'Chen',             req:true },
+  { name:'mobile',  label:'Mobile',      ph:'(214) 555 0134',   req:true },
+  { name:'email',   label:'Email',       ph:'you@company.com',  req:true },
+  { name:'company', label:'Company',     ph:'Optional',         req:false },
+  { name:'title',   label:'Title',       ph:'Optional',         req:false }
+];
+
+const YOU_FULL = [
+  { name:'badge',   label:'Preferred name for your badge', ph:'Dave', req:false,
+    hint:'So the badge does not say Robert on a man everyone calls Bob.' },
+  { name:'dietary', label:'Dietary needs', ph:'Optional', req:false },
+  { name:'access',  label:'Accessibility needs', ph:'Optional', req:false,
+    hint:'Step free access, a seat near the front, anything that makes the night easier.' },
+  { name:'invitedBy', label:'Who invited you?', ph:'A name, or how you heard about the evening', req:false }
+];
+
+const GUEST_HALF = [
+  { name:'gFirst',  label:'Guest first name', ph:'Sarah',           req:true },
+  { name:'gLast',   label:'Guest last name',  ph:'Whitmore',        req:true },
+  { name:'gMobile', label:'Guest mobile',     ph:'Required',        req:true },
+  { name:'gEmail',  label:'Guest email',      ph:'Required',        req:true }
+];
+
+const GUEST_FULL = [
+  { name:'gBadge',   label:'Guest preferred name for badge', ph:'Optional', req:false },
+  { name:'gDietary', label:'Guest dietary needs', ph:'Optional', req:false },
+  { name:'gAccess',  label:'Guest accessibility needs', ph:'Optional', req:false }
+];
+
+const COMPANY_FIELDS = [
+  { name:'coLegal', label:'Company legal name', ph:'Whitmore Land & Cattle LLC', req:true },
+  { name:'coRecog', label:'Name as it should appear in recognition', ph:'Whitmore Land & Cattle', req:true,
+    hint:'This is what goes on the program, the screen, and the sponsor wall.' },
+  { name:'coWeb',   label:'Website', ph:'Optional', req:false }
+];
+
+class Component extends DCLogic {
+  state = {
+    checklistOpen: true, open: false, door: null, step: -1,
+    form: {}, hasGuest: null, seats: 1, tier: null,
+    rosterMode: 'email', roster: [], codeInfo: null,
+    err: {}, openFaq: null, done: false
+  };
+
+  componentDidMount(){ this.applyTheme(); }
+  componentDidUpdate(){ this.applyTheme(); }
+  applyTheme(){
+    const r = document.documentElement.style;
+    r.setProperty('--fl-gold', this.props.goldTone ?? '#C09551');
+    const g = this.props.dawnGlow;
+    r.setProperty('--fl-glow', String((typeof g === 'number' ? g : 55) / 100));
+  }
+
+  set(name, value){
+    this.setState(s => ({ form: Object.assign({}, s.form, { [name]: value }), err: {} }));
+  }
+  pick(door){
+    const n = door === 'host' ? 9 : 0;
+    this.setState({ open:true, door, step:0, err:{}, done:false, codeInfo:null,
+      roster: Array.from({ length:n }, () => ({ name:'', email:'' })) });
+  }
+  rosterSize(){
+    const st = this.state;
+    if(st.door === 'host') return 9;
+    if(st.door === 'sponsor'){
+      const t = TIERS.find(x => x.name === st.tier);
+      return t ? Math.max(0, t.seatCount - 1) : 0;
+    }
+    return 0;
+  }
+  codeBase(){
+    const f = this.state.form;
+    const src = (this.state.door === 'sponsor' ? (f.coRecog || f.coLegal) : (f.tableName || f.last)) || 'TABLE';
+    return 'COLLECTIVE-' + String(src).toUpperCase().replace(/[^A-Z0-9]+/g, '').slice(0, 10);
+  }
+  setRoster(i, field, value){
+    this.setState(s => {
+      const rows = (s.roster || []).slice();
+      while(rows.length <= i) rows.push({ name:'', email:'' });
+      rows[i] = Object.assign({}, rows[i], { [field]: value });
+      return { roster: rows, err:{} };
+    });
+  }
+  stepKey(){
+    const d = this.state.door; if(!d || this.state.step < 0) return null;
+    return DOORS[d].steps[this.state.step] || null;
+  }
+  validate(){
+    const k = this.stepKey(), f = this.state.form;
+    if(k === 'code'){
+      const v = (f.code || '').trim().toUpperCase().replace(/\s+/g, '');
+      if(!v) return { code:'Enter the code from your invitation.' };
+      const rec = CODES[v];
+      if(!rec) return { code:'We cannot find that code. It looks like COLLECTIVE-MIKE, with your host\u2019s first name, or COLLECTIVE-VIP-0000 if we invited you directly.' };
+      if(!rec.vip && rec.used >= rec.seats) return { code:rec.host + '\u2019s table is full. Write to Reign.Bach@everestcollective.com and we will find you a seat.' };
+    }
+    if(k === 'company'){
+      const miss = COMPANY_FIELDS.filter(x => x.req && !(f[x.name]||'').trim()).map(x => x.label.toLowerCase());
+      if(miss.length) return { company:'Still needed: ' + miss.join(', ') + '.' };
+    }
+    if(k === 'roster'){
+      if(this.state.rosterMode === 'email'){
+        const rows = this.state.roster || [];
+        const bad = rows.some(r => (r.email||'').trim() && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(r.email.trim()));
+        if(bad) return { roster:'One of those email addresses does not look right.' };
+      }
+    }
+    if(k === 'tier' && !this.state.tier) return { tier:'Pick a tier to continue, or call and we will build one.' };
+    if(k === 'you'){
+      const miss = YOU_HALF.filter(x => x.req && !(f[x.name]||'').trim()).map(x => x.label.toLowerCase());
+      if(miss.length) return { you:'Still needed: ' + miss.join(', ') + '.' };
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test((f.email||'').trim())) return { you:'That email does not look right.' };
+    }
+    if(k === 'guest'){
+      if(this.state.hasGuest === null) return { guest:'Tell us whether you are bringing someone.' };
+      if(this.state.hasGuest){
+        const miss = GUEST_HALF.filter(x => x.req && !(f[x.name]||'').trim()).map(x => x.label.toLowerCase());
+        if(miss.length) return { guest:'Still needed: ' + miss.join(', ') + '. Their own number and email, not yours.' };
+        if(!(f.gLine||'').trim()) return { guest:'We need your guest\u2019s own line too, the thing they could talk about for an hour.' };
+      }
+    }
+    if(k === 'connect'){
+      const v = (f.line||'').trim();
+      if(!v) return { line:'One line. The thing you could actually talk about.' };
+      if(v.length < 8) return { line:'Go a little further. Specific beats short.' };
+    }
+    return null;
+  }
+  next(){
+    const e = this.validate();
+    if(e){ this.setState({ err:e }); return; }
+    if(this.stepKey() === 'code'){
+      const v = (this.state.form.code || '').trim().toUpperCase().replace(/\s+/g, '');
+      this.setState({ codeInfo: Object.assign({ code:v }, CODES[v] || {}) });
+    }
+    if(this.stepKey() === 'tier'){
+      const n = this.rosterSize();
+      this.setState(s => ({ roster: Array.from({ length:n }, (_, i) => (s.roster||[])[i] || { name:'', email:'' }) }));
+    }
+    const steps = DOORS[this.state.door].steps;
+    if(this.state.step >= steps.length - 1){ this.setState({ done:true, err:{} }); return; }
+    this.setState(s => ({ step: s.step + 1, err:{} }));
+  }
+  back(){
+    if(this.state.done){ this.setState({ done:false }); return; }
+    if(this.state.step <= 0){ this.setState({ step:-1, door:null, err:{} }); return; }
+    this.setState(s => ({ step: s.step - 1, err:{} }));
+  }
+
+  eyebrow(){
+    const o = (this.props.ordinal ?? 'Inaugural').toUpperCase();
+    return o === 'INAUGURAL' ? 'THE INAUGURAL' : 'THE ' + o + ' ANNUAL';
+  }
+  renderVals(){
+    const st = this.state, f = st.form, key = this.stepKey();
+    const door = st.door ? DOORS[st.door] : null;
+    const steps = door ? door.steps : [];
+    const total = steps.length;
+    const line = (f.line || '');
+    const sel = { bg:'rgba(192,149,81,0.16)', border:'#C09551', color:'#F4EEE2' };
+    const off = { bg:'rgba(244,238,226,0.04)', border:'rgba(192,149,81,0.28)', color:'rgba(244,238,226,0.75)' };
+    const s1 = st.seats === 1 ? sel : off, s2 = st.seats === 2 ? sel : off;
+    const gY = st.hasGuest === true ? sel : off, gN = st.hasGuest === false ? sel : off;
+    const fieldBorder = n => (st.err.you || st.err.guest) && !(f[n]||'').trim() ? 'rgba(224,162,94,0.7)' : 'rgba(192,149,81,0.3)';
+    const auto = { invitedBy: (st.codeInfo && (st.codeInfo.host || st.codeInfo.invitedBy)) || '' };
+    const decorate = arr => arr.map(x => Object.assign({}, x, {
+      value: f[x.name] || auto[x.name] || '',
+      border: x.req ? fieldBorder(x.name) : 'rgba(192,149,81,0.3)'
+    }));
+
+    const ci = st.codeInfo || {};
+    const isComp = !!ci.vip;
+    const seatsLeft = Math.max(0, CAPACITY - SEATS_TAKEN);
+    const tierObj = TIERS.find(x => x.name === st.tier) || null;
+    const rosterN = this.rosterSize();
+    const base = this.codeBase();
+    const rosterRows = Array.from({ length: rosterN }, (_, i) => {
+      const row = (st.roster || [])[i] || { name:'', email:'' };
+      return {
+        n: String(i + 1),
+        code: base + '-' + String(i + 1).padStart(2, '0'),
+        name: row.name || '',
+        email: row.email || '',
+        onName: e => this.setRoster(i, 'name', e.target.value),
+        onEmail: e => this.setRoster(i, 'email', e.target.value)
+      };
+    });
+    const filled = rosterRows.filter(r => r.name.trim() || r.email.trim()).length;
+    const wallOf = n => ((TIERS.find(x => x.name === n) || {}).taken || []);
+    const wPres = wallOf('Presenting Sponsor'), wGold = wallOf('Gold Sponsor'),
+          wSilver = wallOf('Silver Sponsor'), wBronze = wallOf('Bronze Sponsor');
+    const hosts = (this.props.tableHosts || '').split(',').map(s => s.trim()).filter(Boolean);
+    const hostOptions = ['Not sure yet'].concat(hosts.length ? hosts : ['Add the 30 host names in Tweaks']);
+
+    const payAmount = st.door === 'seat' ? '$' + (st.seats * 250).toLocaleString()
+                    : st.door === 'host' ? '$2,500'
+                    : (TIERS.find(t => t.name === st.tier) || {}).amount || 'To confirm';
+    const payLabel = st.door === 'seat' ? (st.seats === 1 ? 'One seat' : 'Two seats')
+                   : st.door === 'host' ? 'Table of ten' : (st.tier || 'Tier') + ' sponsorship';
+
+    const summary = [
+      { k:'Attending', v:((f.first||'') + ' ' + (f.last||'')).trim() || 'Not given' },
+      { k:'Badge reads', v:(f.badge || f.first || 'Not given') },
+      { k:'Your line', v: line || 'Not given' },
+      { k:'Mobile', v:f.mobile || 'Not given' },
+      { k:'Email', v:f.email || 'Not given' }
+    ];
+    if(st.door === 'guest'){
+      summary.push({ k:'Invitation code', v:(f.code || '').toUpperCase() || 'Not given' });
+    }
+    if(st.door === 'seat'){
+      summary.push({ k:'Guest', v: st.hasGuest ? ((f.gFirst||'') + ' ' + (f.gLast||'')).trim() : 'Coming alone' });
+      if(st.hasGuest) summary.push({ k:'Their line', v: f.gLine || 'Not given' });
+    }
+    if(f.dietary) summary.push({ k:'Dietary', v:f.dietary });
+    if(f.access) summary.push({ k:'Accessibility', v:f.access });
+    summary.push({ k:'Seated near', v:f.seatNear || 'No preference given' });
+    if(st.door === 'sponsor'){
+      summary.splice(0, 0,
+        { k:'Sponsorship', v: st.tier || 'Not chosen' },
+        { k:'Recognised as', v: f.coRecog || f.coLegal || 'Not given' });
+      summary.push({ k:'Seats to fill', v: filled + ' of ' + rosterN + ' named so far' });
+    }
+    if(st.door === 'host'){
+      summary.splice(0, 0, { k:'Table listed as', v: f.tableName || 'Not given' });
+      summary.push({ k:'Guests', v: filled + ' of 9 named so far' });
+    }
+    if(st.door === 'guest' && isComp){
+      summary.push({ k:'Seat', v:'Complimentary, seated by us' });
+    }
+
+    return {
+      eyebrow: this.eyebrow(),
+      titleLine: this.eyebrow() + ' COLLECTIVE GALA',
+      checklistOpen: st.checklistOpen,
+      hideChecklist: () => this.setState({ checklistOpen:false }),
+      mapUrl: this.props.mapUrl ?? 'https://www.google.com/maps/search/?api=1&query=The+Reserve+at+Marty+B%27s+Bartonville+TX',
+      calendarUrl: this.props.calendarUrl ?? 'https://thecollectivegala.com/the-collective.ics',
+      onepagerUrl: this.props.onepagerUrl ?? '#sponsor',
+      ph4uUrl: this.props.ph4uUrl ?? 'https://pregnancyhelp4u.org',
+      tiers: TIERS.map(x => {
+        const n = (x.taken || []).length;
+        const out = x.cap !== null && n >= x.cap;
+        return Object.assign({}, x, {
+          availability: x.cap === null ? 'Open' : (out ? 'Taken' : (x.cap - n) + ' of ' + x.cap),
+          availColor: out ? 'rgba(244,238,226,0.66)' : '#C09551'
+        });
+      }),
+      faqs: FAQS.map((x, i) => ({
+        q:x.q, a:x.a, open: st.openFaq === i, sign: st.openFaq === i ? '\u2013' : '+',
+        toggle: () => this.setState(s => ({ openFaq: s.openFaq === i ? null : i }))
+      })),
+
+      open: st.open,
+      close: () => this.setState({ open:false }),
+      openDoors: () => this.setState({ open:true, door:null, step:-1, done:false }),
+      pickGuest: () => this.pick('guest'),
+      pickSeat: () => this.pick('seat'),
+      pickHost: () => this.pick('host'),
+      pickSponsor: () => this.pick('sponsor'),
+
+      atDoors: st.open && !st.door,
+      doorLabel: door ? door.label : 'Registration',
+      stepLabel: st.done ? 'Confirmed' : (door ? 'Step ' + (st.step + 1) + ' of ' + total : 'Choose a door'),
+      progress: st.done ? '100%' : (door ? Math.round(((st.step + 1) / total) * 100) + '%' : '0%'),
+
+      showCode:    !st.done && key === 'code',
+      showSeats:   !st.done && key === 'seats',
+      showTable:   !st.done && key === 'table',
+      showTier:    !st.done && key === 'tier',
+      showCompany: !st.done && key === 'company',
+      showRoster:  !st.done && key === 'roster',
+      showYou:     !st.done && key === 'you',
+      showGuest:   !st.done && key === 'guest',
+      showConnect: !st.done && key === 'connect',
+      showReview:  !st.done && key === 'review',
+      showPay:     !st.done && key === 'pay',
+      showDone:    st.done,
+      showNav:     !st.done && !!door,
+      nextLabel:   (key === 'review' || key === 'pay') ? 'Complete registration' : 'Continue',
+      next: () => this.next(),
+      back: () => this.back(),
+      onField: e => this.set(e.target.name, e.target.value),
+
+      vCode:f.code||'', vTableName:f.tableName||'', vHost:f.host||'Not sure yet',
+      vLine:line, vSeatNear:f.seatNear||'', vGuestLine:f.gLine||'',
+      errCode:st.err.code||'', errTier:st.err.tier||'', errYou:st.err.you||'',
+      errGuest:st.err.guest||'', errLine:st.err.line||'',
+
+      seatOneBg:s1.bg, seatOneBorder:s1.border, seatOneColor:s1.color,
+      seatTwoBg:s2.bg, seatTwoBorder:s2.border, seatTwoColor:s2.color,
+      seatTotal:'$' + (st.seats * 250).toLocaleString(),
+      setOne: () => this.setState({ seats:1 }),
+      setTwo: () => this.setState({ seats:2 }),
+
+      tierChoices: TIERS.map(t => {
+        const takenN = (t.taken || []).length;
+        const soldOut = t.cap !== null && takenN >= t.cap;
+        const on = st.tier === t.name;
+        return {
+          name:t.name, amount:t.amount, seats:t.seats, recognition:t.recognition,
+          soldOut, open: !soldOut,
+          availability: t.cap === null ? 'Open' : (soldOut ? 'No longer available' : (t.cap - takenN) + ' of ' + t.cap + ' remaining'),
+          availColor: soldOut ? 'rgba(244,238,226,0.66)' : '#C09551',
+          takenList: (t.taken || []).map(s => s.company).join(', '),
+          logos: (t.taken || []).filter(s => s.slot),
+          bg: soldOut ? 'rgba(244,238,226,0.02)' : (on ? 'rgba(192,149,81,0.16)' : 'rgba(244,238,226,0.04)'),
+          border: soldOut ? 'rgba(192,149,81,0.14)' : (on ? '#C09551' : 'rgba(192,149,81,0.25)'),
+          nameColor: soldOut ? 'rgba(244,238,226,0.66)' : 'var(--fl-ivory)',
+          cursor: soldOut ? 'not-allowed' : 'pointer',
+          pick: () => { if(!soldOut) this.setState({ tier:t.name, err:{} }); }
+        };
+      }),
+      seatsLeft: String(seatsLeft),
+      seatsTaken: String(SEATS_TAKEN),
+      capacity: String(CAPACITY),
+      capacityPct: Math.round((SEATS_TAKEN / CAPACITY) * 100) + '%',
+      nearlyFull: seatsLeft <= 60,
+      wallPresenting: wPres, wallGold: wGold, wallSilver: wSilver, wallBronze: wBronze,
+      hasPresenting: wPres.length > 0, hasGold: wGold.length > 0,
+      hasSilver: wSilver.length > 0, hasBronze: wBronze.length > 0,
+      anySponsors: (wPres.length + wGold.length + wSilver.length + wBronze.length) > 0,
+      companyFields: decorate(COMPANY_FIELDS),
+      errCompany: st.err.company || '',
+      errRoster: st.err.roster || '',
+      rosterRows,
+      rosterN: String(rosterN),
+      rosterFilled: String(filled),
+      rosterLabel: st.door === 'sponsor' ? 'Your sponsor seats' : 'Your table',
+      rosterByEmail: st.rosterMode === 'email',
+      showCodes: st.rosterMode === 'codes',
+      emailModeBg: st.rosterMode === 'email' ? 'rgba(192,149,81,0.16)' : 'rgba(244,238,226,0.04)',
+      emailModeBorder: st.rosterMode === 'email' ? '#C09551' : 'rgba(192,149,81,0.28)',
+      codeModeBg: st.rosterMode === 'codes' ? 'rgba(192,149,81,0.16)' : 'rgba(244,238,226,0.04)',
+      codeModeBorder: st.rosterMode === 'codes' ? '#C09551' : 'rgba(192,149,81,0.28)',
+      setEmailMode: () => this.setState({ rosterMode:'email' }),
+      setCodeMode: () => this.setState({ rosterMode:'codes' }),
+      isComp,
+      compHost: ci.host || '',
+      codePreview: (() => {
+        const v = (f.code || '').trim().toUpperCase().replace(/\s+/g, '');
+        const rec = CODES[v];
+        if(!rec) return '';
+        if(rec.vip) return 'Recognised. This is a complimentary seat from Everest Collective, and we will seat you ourselves.';
+        if(rec.used >= rec.seats) return '';
+        return 'Recognised. ' + rec.host + ' is holding a seat for you at table ' + rec.table + ', with ' + (rec.seats - rec.used) + ' still open.';
+      })(),
+      codeGreeting: ci.vip ? 'Everest Collective is holding this seat for you, with our compliments.'
+                   : (ci.host ? ci.host + ' is holding a seat for you at table ' + ci.table + '.' : ''),
+
+      youHalf: decorate(YOU_HALF), youFull: decorate(YOU_FULL),
+      guestHalf: decorate(GUEST_HALF), guestFull: decorate(GUEST_FULL),
+      hostOptions,
+
+      hasGuest: st.hasGuest === true,
+      guestYes: () => this.setState({ hasGuest:true, err:{} }),
+      guestNo: () => this.setState({ hasGuest:false, err:{} }),
+      gYesBg:gY.bg, gYesBorder:gY.border, gYesColor:gY.color,
+      gNoBg:gN.bg, gNoBorder:gN.border, gNoColor:gN.color,
+
+      lineCount: line.length + ' / 60',
+      countColor: line.length > 52 ? '#C09551' : 'rgba(244,238,226,0.66)',
+      lineBorder: st.err.line ? 'rgba(224,162,94,0.7)' : 'rgba(192,149,81,0.4)',
+
+      summary, payAmount, payLabel,
+      doneEmail: f.email || 'your inbox',
+      doneLine: line ? '\u201C' + line + '\u201D' : 'your line',
+      doneGuest: (f.gFirst || 'your guest')
+    };
+  }
+}
+
+</script>
+
+
+</body></html>

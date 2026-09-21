@@ -1,0 +1,152 @@
+import fs from "fs";
+import path from "path";
+import type { Metadata } from "next";
+import { createServiceClient } from "@/lib/supabaseService";
+import { render } from "@/lib/gala/template";
+import GalaAccordion from "./GalaAccordion";
+import "./gala.css";
+
+/**
+ * The public gala page.
+ *
+ * The markup is the design as authored, kept verbatim in
+ * static.template.html. Everything that used to be a hardcoded constant
+ * inside a 14MB bundle now comes out of Supabase: the seat count, the
+ * sponsor wall, the tier availability, the FAQs, the venue.
+ *
+ * Three things that were live and wrong are structurally impossible here.
+ * The internal checklist is not in this template at all. The seat count
+ * is derived from gala_capacity rather than a number somebody typed. The
+ * sponsor wall shows only rows marked confirmed and show_on_wall, so it
+ * is empty until a sponsor actually signs something.
+ */
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "The Inaugural Collective Gala",
+  description:
+    "An evening for faith, family, life, and the North Texas community, benefiting Pregnancy Help 4 U.",
+};
+
+const money = (cents: number) => "$" + Math.round(cents / 100).toLocaleString("en-US");
+
+type TierRow = {
+  id: string;
+  name: string;
+  amount_cents: number;
+  seats_label: string;
+  recognition: string;
+  cap: number | null;
+  sort_order: number;
+};
+
+export default async function GalaPage() {
+  const supabase = createServiceClient();
+
+  const [settingsRes, capacityRes, tiersRes, faqsRes, sponsorsRes] = await Promise.all([
+    supabase.from("gala_settings").select("*").eq("id", 1).single(),
+    supabase.from("gala_capacity").select("*").maybeSingle(),
+    supabase.from("gala_tiers").select("*").eq("active", true).order("sort_order"),
+    supabase.from("gala_faqs").select("*").eq("published", true).order("sort_order"),
+    supabase
+      .from("gala_sponsors")
+      .select("id, legal_name, recognition_name, tier_id, status, show_on_wall")
+      .eq("status", "confirmed")
+      .eq("show_on_wall", true),
+  ]);
+
+  const s = settingsRes.data;
+  if (!s) {
+    // Settings row 1 is seeded by migration 0013. Its absence is a
+    // deployment problem, not something to paper over with defaults.
+    throw new Error("gala_settings row 1 is missing");
+  }
+
+  const cap = capacityRes.data;
+  const tiers = (tiersRes.data ?? []) as TierRow[];
+  const faqs = faqsRes.data ?? [];
+  const sponsors = sponsorsRes.data ?? [];
+
+  const capacity = cap?.capacity ?? s.capacity;
+  const seatsLeft = cap?.seats_remaining ?? capacity;
+  const capacityPct = capacity > 0 ? Math.round(((capacity - seatsLeft) / capacity) * 100) : 0;
+
+  // Tier availability, counted from real sponsors rather than asserted.
+  const takenByTier = new Map<string, number>();
+  for (const sp of sponsors) {
+    if (sp.tier_id) takenByTier.set(sp.tier_id, (takenByTier.get(sp.tier_id) ?? 0) + 1);
+  }
+
+  const tierRows = tiers.map((t) => {
+    const taken = takenByTier.get(t.id) ?? 0;
+    const left = t.cap == null ? null : Math.max(0, t.cap - taken);
+    return {
+      name: t.name,
+      amount: money(t.amount_cents),
+      seats: t.seats_label,
+      recognition: t.recognition,
+      availability:
+        left == null ? "Available" : left === 0 ? "No longer available" : `${left} remaining`,
+      availColor: left === 0 ? "rgba(244,238,226,0.45)" : "var(--fl-gold)",
+    };
+  });
+
+  // The wall, by tier name. A sponsor with no logo uploaded renders as
+  // their recognition name, which is better than an empty rectangle.
+  const byTierName = (name: string) =>
+    sponsors
+      .filter((sp) => tiers.find((t) => t.id === sp.tier_id)?.name === name)
+      .map((sp) => ({ company: sp.recognition_name ?? sp.legal_name, slot: `sponsor-${sp.id}` }));
+
+  const wallPresenting = byTierName("Presenting");
+  const wallGold = byTierName("Gold");
+  const wallSilver = byTierName("Silver");
+  const wallBronze = byTierName("Bronze");
+
+  const scope = {
+    // Every answer ships expanded; GalaAccordion collapses them on mount.
+    faqs: faqs.map((f) => ({ q: f.question, a: f.answer, open: true, sign: "\u2212" })),
+    tiers: tierRows,
+
+    seatsLeft,
+    capacity,
+    capacityPct,
+
+    // The H1 reads in three lines: this, then COLLECTIVE, then GALA.
+    // "By invitation only" is the small line above it and is hardcoded
+    // in the markup, which is what I had this pointed at.
+    eyebrow: "The Inaugural",
+    titleLine: s.event_name,
+
+    mapUrl: s.map_url ?? "#",
+    onepagerUrl: s.onepager_url ?? "#",
+    ph4uUrl: s.beneficiary_url ?? "#",
+    calendarUrl: s.calendar_url ?? "#",
+
+    // The wizard is not built yet, so the modal stays shut and the door
+    // buttons are inert. Wiring them to a half-finished form would be
+    // worse than leaving them quiet.
+    open: false,
+
+    anySponsors: sponsors.length > 0,
+    hasPresenting: wallPresenting.length > 0,
+    hasGold: wallGold.length > 0,
+    hasSilver: wallSilver.length > 0,
+    hasBronze: wallBronze.length > 0,
+    wallPresenting,
+    wallGold,
+    wallSilver,
+    wallBronze,
+  };
+
+  const tplPath = path.join(process.cwd(), "app/gala/static.template.html");
+  const html = render(fs.readFileSync(tplPath, "utf8"), scope);
+
+  return (
+    <>
+      <div id="gala-content" dangerouslySetInnerHTML={{ __html: html }} />
+      <GalaAccordion />
+    </>
+  );
+}

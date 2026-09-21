@@ -1,0 +1,428 @@
+<nav style="position:sticky;top:0;z-index:50;background:rgba(11,21,33,0.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(192,149,81,0.16);">
+    <div style="max-width:1240px;margin:0 auto;padding:12px clamp(16px,3vw,32px);min-height:74px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;row-gap:10px;column-gap:clamp(12px,2vw,28px);">
+      <a href="#top" style="flex:none;font-family:'Marcellus',Georgia,serif;font-size:clamp(10px,1.15vw,15px);letter-spacing:0.14em;color:var(--fl-ivory);text-decoration:none;white-space:nowrap;">{{ titleLine }}</a>
+      <div style="flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:clamp(14px,2.4vw,34px);">
+        <div style="flex:0 1 auto;min-width:140px;display:flex;align-items:center;gap:clamp(14px,2.4vw,34px);overflow-x:auto;">
+        <a href="#mission" style="font-size:11.5px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,238,226,0.66);text-decoration:none;white-space:nowrap;" style-hover="color:#F4EEE2;">The mission</a>
+        <a href="#sponsor" style="font-size:11.5px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,238,226,0.66);text-decoration:none;white-space:nowrap;" style-hover="color:#F4EEE2;">Sponsorship</a>
+        <a href="#evening" style="font-size:11.5px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,238,226,0.66);text-decoration:none;white-space:nowrap;" style-hover="color:#F4EEE2;">The evening</a>
+        <a href="#venue" style="font-size:11.5px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,238,226,0.66);text-decoration:none;white-space:nowrap;" style-hover="color:#F4EEE2;">Venue</a>
+        <a href="#faq" style="font-size:11.5px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,238,226,0.66);text-decoration:none;white-space:nowrap;" style-hover="color:#F4EEE2;">FAQ</a>
+        </div>
+        <button sc-camel-on-click="{{ openDoors }}" style="flex:none;white-space:nowrap;background:var(--fl-gold);color:#0B1521;border:none;font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;padding:13px 20px;cursor:pointer;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:#D4AF6A;">RSVP or register</button>
+      </div>
+    </div>
+  </nav>
+
+  <header id="top" style="position:relative;overflow:hidden;background:var(--fl-night);">
+    <div style="position:absolute;left:50%;bottom:-340px;transform:translateX(-50%);width:1900px;height:820px;background:radial-gradient(ellipse at 50% 100%, rgba(206,163,92,0.85) 0%, rgba(200,157,88,0.42) 26%, rgba(194,151,83,0.18) 46%, rgba(192,149,81,0.05) 64%, rgba(192,149,81,0) 78%);opacity:var(--fl-glow);pointer-events:none;"></div>
+    <div style="position:relative;max-width:1240px;margin:0 auto;padding:clamp(72px,10vw,128px) clamp(20px,4vw,32px) clamp(72px,9vw,116px);display:flex;flex-direction:column;align-items:center;text-align:center;">
+      <div style="font-size:11px;font-weight:300;letter-spacing:0.42em;text-transform:uppercase;color:rgba(244,238,226,0.66);">By invitation only</div>
+      <h1 style="margin:26px 0 0;display:flex;flex-direction:column;align-items:center;font-family:'Marcellus',Georgia,serif;font-weight:400;color:var(--fl-ivory);"><span style="display:block;font-size:clamp(14px,2.4vw,34px);line-height:1;letter-spacing:0.30em;margin-right:-0.30em;color:rgba(244,238,226,0.72);">{{ eyebrow }}</span><span style="display:block;margin-top:clamp(10px,1.5vw,20px);font-size:clamp(38px,7vw,100px);line-height:0.98;letter-spacing:0.045em;margin-right:-0.045em;">COLLECTIVE</span><span style="display:block;margin-top:clamp(7px,1.1vw,15px);font-size:clamp(18px,3.3vw,47px);line-height:1;letter-spacing:0.46em;margin-right:-0.46em;">GALA</span></h1>
+      <div style="margin-top:26px;line-height:0;">
+        <svg width="360" height="44" sc-camel-view-box="0 0 360 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 41 Q180 -10 358 41" stroke="var(--fl-gold)" stroke-width="1.4" fill="none" stroke-linecap="round"></path></svg>
+      </div>
+      <p style="margin:22px 0 0;max-width:620px;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:300;font-size:34px;line-height:1.3;color:rgba(244,238,226,0.9);text-wrap:pretty;">An evening for faith, family, life, and the North Texas community</p>
+      <div style="margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:18px;">
+        <div style="font-size:clamp(11px,1.2vw,14px);font-weight:400;letter-spacing:0.26em;text-indent:0.26em;color:var(--fl-gold);">BENEFITING PREGNANCY HELP 4 U</div>
+        <a href="{{ ph4uUrl }}" target="_blank" rel="noopener" aria-label="Pregnancy Help 4 U, opens their website in a new tab" style="display:block;line-height:0;opacity:0.9;transition:opacity 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="opacity:1;">
+          <img src="/gala-img/7b70daec-5728-4f1d-825b-8fffe4ac17b4.png" alt="Pregnancy Help 4 U" style="height:clamp(38px,4.4vw,52px);width:auto;display:block;">
+        </a>
+      </div>
+
+      <div style="margin-top:52px;display:flex;flex-direction:column;align-items:center;gap:18px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="width:52px;height:1px;background:rgba(192,149,81,0.55);"></div>
+          <div style="font-size:20px;font-weight:400;letter-spacing:0.2em;text-indent:0.2em;color:var(--fl-gold);">THURSDAY, DECEMBER 3, 2026</div>
+        </div>
+        <div style="font-size:14px;font-weight:400;letter-spacing:0.18em;text-indent:0.18em;color:rgba(244,238,226,0.9);">THE RESERVE AT MARTY B'S &nbsp;·&nbsp; BARTONVILLE, TEXAS</div>
+        <div style="font-size:12.5px;font-weight:300;letter-spacing:0.2em;text-indent:0.2em;color:rgba(244,238,226,0.6);">RECEPTION 6:30 &nbsp;·&nbsp; DINNER 7:30 &nbsp;·&nbsp; BLACK TIE, TEXAS</div>
+      </div>
+
+      <button sc-camel-on-click="{{ openDoors }}" style="margin-top:56px;background:var(--fl-gold);color:#0B1521;border:none;font-size:13px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;padding:21px 52px;cursor:pointer;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:#D4AF6A;">RSVP or register</button>
+      <div style="margin-top:22px;font-size:12px;font-weight:300;letter-spacing:0.16em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Registration closes November 16</div>
+    </div>
+  </header>
+
+  <section id="doors" style="position:relative;background:var(--fl-deep);border-top:1px solid rgba(192,149,81,0.16);padding:clamp(64px,8vw,104px) clamp(20px,4vw,32px) clamp(68px,9vw,112px);">
+    <div style="max-width:1240px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;">
+        <div style="font-size:11px;font-weight:300;letter-spacing:0.36em;text-transform:uppercase;color:var(--fl-gold);">Four ways in</div>
+        <h2 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(34px,4.2vw,54px);line-height:1.08;letter-spacing:0.02em;color:var(--fl-ivory);">How are you joining us?</h2>
+        <p style="margin:0;max-width:640px;font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;line-height:1.6;color:rgba(244,238,226,0.72);text-wrap:pretty;">Everyone arrives here from a different place, so we will only ask you for what we need. Most guests are through in about two minutes.</p>
+        <div style="margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <span style="font-family:'Marcellus',Georgia,serif;font-size:34px;line-height:1;color:var(--fl-gold);">{{ seatsLeft }}</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">of {{ capacity }} seats remain</span>
+          </div>
+          <div style="width:min(320px,70vw);height:2px;background:rgba(244,238,226,0.12);">
+            <div style="height:2px;background:var(--fl-gold);width:{{ capacityPct }};"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:clamp(40px,5vw,64px);display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:24px;">
+
+        <div style="display:flex;flex-direction:column;background:rgba(244,238,226,0.035);border:1px solid rgba(192,149,81,0.22);border-top:3px solid var(--fl-gold);padding:36px 30px 32px;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.065);">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Individual seat</div>
+          <h3 style="margin:16px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:27px;line-height:1.2;color:var(--fl-ivory);">One seat, or two</h3>
+          <p style="margin:14px 0 0;flex:1;font-family:'Cormorant Garamond',Georgia,serif;font-size:19.5px;line-height:1.55;color:rgba(244,238,226,0.68);">$250 a seat. Reception, dinner, and the program, and we will seat you with people worth meeting.</p>
+          <button sc-camel-on-click="{{ pickSeat }}" style="margin-top:26px;min-height:54px;display:flex;align-items:center;justify-content:center;text-align:center;background:none;border:1px solid rgba(192,149,81,0.6);color:var(--fl-ivory);font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:12px 18px;cursor:pointer;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:var(--fl-gold);color:#0B1521;border-color:var(--fl-gold);">Buy a seat</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;background:rgba(244,238,226,0.035);border:1px solid rgba(192,149,81,0.22);border-top:3px solid rgba(192,149,81,0.45);padding:36px 30px 32px;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.065);">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Table host</div>
+          <h3 style="margin:16px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:27px;line-height:1.2;color:var(--fl-ivory);">Claim a table of ten</h3>
+          <p style="margin:14px 0 0;flex:1;font-family:'Cormorant Garamond',Georgia,serif;font-size:19.5px;line-height:1.55;color:rgba(244,238,226,0.68);">You take the table, we hand you the invitation and the code, and your ten guests register against your name. Thirty tables, and they go quickly.</p>
+          <button sc-camel-on-click="{{ pickHost }}" style="margin-top:26px;min-height:54px;display:flex;align-items:center;justify-content:center;text-align:center;background:none;border:1px solid rgba(192,149,81,0.6);color:var(--fl-ivory);font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:12px 18px;cursor:pointer;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:var(--fl-gold);color:#0B1521;border-color:var(--fl-gold);">Host a table</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;background:rgba(244,238,226,0.035);border:1px solid rgba(192,149,81,0.22);border-top:3px solid rgba(192,149,81,0.45);padding:36px 30px 32px;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.065);">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Invited guest</div>
+          <h3 style="margin:16px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:27px;line-height:1.2;color:var(--fl-ivory);">A host is holding a seat for you</h3>
+          <p style="margin:14px 0 0;flex:1;font-family:'Cormorant Garamond',Georgia,serif;font-size:19.5px;line-height:1.55;color:rgba(244,238,226,0.68);">You have an invitation code from the person who invited you, or from us. Confirm the seat, tell us about yourself, and you are done. No payment.</p>
+          <button sc-camel-on-click="{{ pickGuest }}" style="margin-top:26px;min-height:54px;display:flex;align-items:center;justify-content:center;text-align:center;background:none;border:1px solid rgba(192,149,81,0.6);color:var(--fl-ivory);font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:12px 18px;cursor:pointer;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:var(--fl-gold);color:#0B1521;border-color:var(--fl-gold);">Confirm attendance</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;background:rgba(244,238,226,0.035);border:1px solid rgba(192,149,81,0.22);border-top:3px solid rgba(192,149,81,0.45);padding:36px 30px 32px;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.065);">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Corporate sponsor</div>
+          <h3 style="margin:16px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:27px;line-height:1.2;color:var(--fl-ivory);">Put your name on the night</h3>
+          <p style="margin:14px 0 0;flex:1;font-family:'Cormorant Garamond',Georgia,serif;font-size:19.5px;line-height:1.55;color:rgba(244,238,226,0.68);">Seats, logo placement, and recognition from the stage. Start online or talk to a person, whichever you prefer.</p>
+          <button sc-camel-on-click="{{ pickSponsor }}" style="margin-top:26px;min-height:54px;display:flex;align-items:center;justify-content:center;text-align:center;background:none;border:1px solid rgba(192,149,81,0.6);color:var(--fl-ivory);font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:12px 18px;cursor:pointer;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:var(--fl-gold);color:#0B1521;border-color:var(--fl-gold);">View tiers</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="mission" style="background:var(--fl-ivory);color:var(--fl-ink);padding:clamp(72px,9vw,120px) clamp(20px,4vw,32px);">
+    <div style="max-width:1240px;margin:0 auto;">
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:clamp(28px,5vw,80px);justify-content:space-between;">
+        <div style="flex:1 1 280px;max-width:340px;display:flex;flex-direction:column;gap:32px;">
+          <div>
+            <div style="font-size:11px;font-weight:500;letter-spacing:0.34em;text-transform:uppercase;color:#7A5C24;">The mission</div>
+            <h2 style="margin:18px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(32px,3.6vw,46px);line-height:1.1;letter-spacing:0.01em;color:var(--fl-ink);">Pregnancy Help 4 U</h2>
+          </div>
+          <a href="{{ ph4uUrl }}" target="_blank" rel="noopener" aria-label="Pregnancy Help 4 U, opens their website in a new tab" style="display:block;line-height:0;">
+            <img src="/gala-img/044b3db9-dc30-4edc-b233-470d9c64022d.png" alt="Pregnancy Help 4 U" style="height:64px;width:auto;display:block;">
+          </a>
+          <div style="display:flex;flex-direction:column;gap:14px;border-top:1px solid rgba(21,30,40,0.16);padding-top:24px;">
+            <div style="font-size:10.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:rgba(21,30,40,0.72);">Every service, no charge</div>
+            <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(21,30,40,0.8);">A woman never receives a bill at PH4U. Not for the pregnancy test. Not for the sonogram. Not for parenting classes. Not for having someone available to talk with online, 24/7.</p>
+          </div>
+        </div>
+
+        <div style="flex:2 1 440px;max-width:700px;display:flex;flex-direction:column;gap:30px;">
+          <div style="display:flex;flex-direction:column;gap:22px;font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;line-height:1.62;color:rgba(21,30,40,0.86);text-wrap:pretty;">
+            <p style="margin:0;">When a woman discovers she may be pregnant, fear and uncertainty can set in quickly. The decisions she faces in the days ahead may shape her life for years to come. PH4U is a place in Fort Worth where she can walk in and find help, often that very same day. She can receive a pregnancy test and sonogram, sit with someone who will listen without judgment, and begin making a plan for what comes next. She does not have to navigate it alone.</p>
+            <p style="margin:0;">And PH4U keeps walking with her. Through parenting classes, diapers, car seats, formula, practical resources, and ongoing support, that relationship continues long after the first appointment and even after the baby is born, when the challenges may simply take a different shape. No one at the door asks her to justify why she needs help. And no one hands her an invoice.</p>
+            <p style="margin:0;">Everest Collective is underwriting the venue and event setup costs so that 100% of the evening’s proceeds can benefit Pregnancy Help 4 U rather than being used to cover the room or the entertainment. Your generosity helps ensure that when a woman walks through PH4U’s doors, the answer can continue to be: every service, no charge.</p>
+          </div>
+
+          <div style="background:var(--fl-night);color:var(--fl-ivory);padding:clamp(28px,4vw,40px);display:flex;flex-wrap:wrap;align-items:center;gap:clamp(20px,4vw,44px);">
+            <div style="flex:0 0 auto;">
+              <div style="font-family:'Marcellus',Georgia,serif;font-size:clamp(58px,8vw,88px);line-height:0.9;color:var(--fl-gold);">770</div>
+            </div>
+            <div style="flex:1 1 220px;min-width:200px;display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Chose life in 2025</div>
+              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.5;color:rgba(244,238,226,0.86);">Seven hundred and seventy women walked in uncertain and walked out having decided to carry their child. That is the number the evening is built around.</p>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div style="font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:#7A5C24;">What 2025 looked like</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));column-gap:32px;row-gap:8px;">
+              <div style="border-top:1px solid rgba(21,30,40,0.16);padding:22px 0 4px;">
+                <div style="font-family:'Marcellus',Georgia,serif;font-size:34px;line-height:1;color:#7A5C24;">1,401</div>
+                <div style="margin-top:11px;font-size:10.5px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:rgba(21,30,40,0.72);line-height:1.6;">Sonograms provided</div>
+              </div>
+              <div style="border-top:1px solid rgba(21,30,40,0.16);padding:22px 0 4px;">
+                <div style="font-family:'Marcellus',Georgia,serif;font-size:34px;line-height:1;color:#7A5C24;">2,008</div>
+                <div style="margin-top:11px;font-size:10.5px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:rgba(21,30,40,0.72);line-height:1.6;">Women and families served</div>
+              </div>
+              <div style="border-top:1px solid rgba(21,30,40,0.16);padding:22px 0 4px;">
+                <div style="font-family:'Marcellus',Georgia,serif;font-size:34px;line-height:1;color:#7A5C24;">4,173</div>
+                <div style="margin-top:11px;font-size:10.5px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:rgba(21,30,40,0.72);line-height:1.6;">Client visits through the door</div>
+              </div>
+              <div style="border-top:1px solid rgba(21,30,40,0.16);padding:22px 0 4px;">
+                <div style="font-family:'Marcellus',Georgia,serif;font-size:34px;line-height:1;color:#7A5C24;">1,517</div>
+                <div style="margin-top:11px;font-size:10.5px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:rgba(21,30,40,0.72);line-height:1.6;">Pregnancy tests</div>
+              </div>
+              <div style="border-top:1px solid rgba(21,30,40,0.16);padding:22px 0 4px;">
+                <div style="font-family:'Marcellus',Georgia,serif;font-size:34px;line-height:1;color:#7A5C24;">83,941</div>
+                <div style="margin-top:11px;font-size:10.5px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:rgba(21,30,40,0.72);line-height:1.6;">Material items handed out</div>
+              </div>
+              <div style="border-top:1px solid rgba(21,30,40,0.16);padding:22px 0 4px;">
+                <div style="font-family:'Marcellus',Georgia,serif;font-size:34px;line-height:1;color:#7A5C24;">286</div>
+                <div style="margin-top:11px;font-size:10.5px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:rgba(21,30,40,0.72);line-height:1.6;">Parenting classes taught</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A5C24;">
+              <span style="width:22px;height:1px;background:#C09551;"></span>
+              PH4U 2025 figures, confirmed by their team
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fl-photo-grid" style="margin-top:clamp(48px,6vw,80px);">
+        <div style="aspect-ratio:4 / 5;">
+          <img src="/gala-img/9f59ac70-54a0-4472-a6d6-e557bd109652.jpg" alt="A mother holding her newborn daughter" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+        <div style="aspect-ratio:4 / 5;">
+          <img src="/gala-img/340cb778-a81d-46a7-b2d9-26fd9a5db8d8.jpg" alt="A PH4U sonographer at the ultrasound machine" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+        <div style="aspect-ratio:4 / 5;">
+          <img src="/gala-img/2e06abbe-bb27-4767-afae-bf67d20fec77.jpg" alt="A PH4U staff member handing a client a basket of resources at the front desk" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+        <div style="aspect-ratio:4 / 5;">
+          <img src="/gala-img/2c3791b6-d32c-49fe-aed2-ea440ddec444.jpg" alt="The PH4U resource room, stocked with diapers, clothing and supplies" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+      </div>
+      <div style="margin-top:14px;font-size:11px;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;color:rgba(21,30,40,0.66);">Photography supplied by Pregnancy Help 4 U, used with their approval</div>
+
+      <div style="margin-top:clamp(56px,7vw,96px);padding-top:clamp(40px,5vw,64px);border-top:1px solid rgba(21,30,40,0.16);display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,80px);justify-content:space-between;align-items:flex-start;">
+        <div style="flex:1 1 280px;max-width:340px;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:0.34em;text-transform:uppercase;color:#7A5C24;">Where the money goes</div>
+          <h3 style="margin:18px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(26px,2.8vw,36px);line-height:1.15;color:var(--fl-ink);">Your generosity makes free care possible</h3>
+        </div>
+        <div style="flex:2 1 440px;max-width:700px;display:flex;flex-direction:column;gap:26px;">
+          <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;line-height:1.6;color:rgba(21,30,40,0.86);text-wrap:pretty;">Behind every number is a woman who needs access to compassionate care, trustworthy information, and support. The proceeds of this event support the clinic's work providing free services and resources to women in this community.</p>
+          <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;line-height:1.6;color:rgba(21,30,40,0.86);text-wrap:pretty;">Every contribution helps sustain the care that happens inside those doors, from pregnancy testing and ultrasounds to education, counseling, and continued support. Together, we can help make sure that compassionate, no-cost care remains available to the women who need it.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:clamp(48px,6vw,72px);background:rgba(21,30,40,0.05);border-left:2px solid #C09551;padding:clamp(28px,4vw,44px);display:flex;flex-wrap:wrap;gap:clamp(24px,4vw,56px);">
+        <div style="flex:1 1 240px;max-width:300px;display:flex;flex-direction:column;gap:14px;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:#7A5C24;">Aspirations for PH4U</div>
+          <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(24px,2.6vw,32px);line-height:1.15;color:var(--fl-ink);">Prenatal care, on site</h3>
+        </div>
+        <div style="flex:2 1 380px;max-width:640px;display:flex;flex-direction:column;gap:20px;">
+          <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.6;color:rgba(21,30,40,0.84);text-wrap:pretty;">Right now a woman who decides to carry her baby often waits weeks for a first prenatal appointment, because insurance and benefits take time to come through. PH4U wants to close that gap themselves, with early prenatal care in the building she already trusts.</p>
+          <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.6;color:rgba(21,30,40,0.84);text-wrap:pretty;">The model looks like a midwife more than a clinic. Education, reassurance, somebody to answer the question she is embarrassed to ask, and it keeps working alongside her OB once she has one. What stands between them and it is nursing staff they can count on and room to put an exam table.</p>
+          <div style="display:flex;align-items:center;gap:12px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A5C24;">
+            <span style="width:22px;height:1px;background:#C09551;"></span>
+            This is what the room is being asked to fund
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sponsor" style="background:var(--fl-night);padding:clamp(68px,9vw,112px) clamp(20px,4vw,32px);">
+    <div style="max-width:1240px;margin:0 auto;">
+      <div style="display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,80px);justify-content:space-between;align-items:flex-end;">
+        <div style="flex:1 1 280px;max-width:340px;">
+          <div style="font-size:11px;font-weight:300;letter-spacing:0.34em;text-transform:uppercase;color:var(--fl-gold);">Sponsorship</div>
+          <h2 style="margin:18px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(32px,3.6vw,46px);line-height:1.1;color:var(--fl-ivory);">Put your name on the night</h2>
+        </div>
+        <p style="flex:2 1 440px;max-width:700px;margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;line-height:1.6;color:rgba(244,238,226,0.72);text-wrap:pretty;">Three hundred people who run things in North Texas will be in one room for four hours. Everest Collective is paying for the venue and the set up costs, so 100% of the proceeds from the evening go to Pregnancy Help 4 U rather than into the room.</p>
+      </div>
+
+      <div style="margin-top:56px;border:1px solid rgba(192,149,81,0.24);overflow-x:auto;">
+        <div style="display:grid;min-width:860px;grid-template-columns:1.2fr 0.8fr 0.6fr 1.5fr 0.7fr;background:rgba(192,149,81,0.10);border-bottom:1px solid rgba(192,149,81,0.24);">
+          <div style="padding:16px 24px;font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.7);">Tier</div>
+          <div style="padding:16px 24px;font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.7);">Investment</div>
+          <div style="padding:16px 24px;font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.7);">Seats</div>
+          <div style="padding:16px 24px;font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.7);">Recognition</div>
+          <div style="padding:16px 24px;font-size:10.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.7);">Left</div>
+        </div>
+        <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="4">
+          <div style="display:grid;min-width:860px;grid-template-columns:1.2fr 0.8fr 0.6fr 1.5fr 0.7fr;border-bottom:1px solid rgba(192,149,81,0.14);align-items:center;">
+            <div style="padding:22px 24px;font-family:'Marcellus',Georgia,serif;font-size:22px;color:var(--fl-ivory);">{{ t.name }}</div>
+            <div style="padding:22px 24px;font-size:17px;font-weight:400;letter-spacing:0.06em;color:var(--fl-gold);">{{ t.amount }}</div>
+            <div style="padding:22px 24px;font-size:17px;font-weight:300;color:rgba(244,238,226,0.82);">{{ t.seats }}</div>
+            <div style="padding:22px 24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.5;color:rgba(244,238,226,0.68);">{{ t.recognition }}</div>
+            <div style="padding:22px 24px;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:{{ t.availColor }};">{{ t.availability }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin-top:16px;display:flex;align-items:center;gap:12px;font-size:11px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:rgba(192,149,81,0.85);">
+        <span style="width:22px;height:1px;background:rgba(192,149,81,0.6);"></span>
+        Seats included at each tier are provisional and need sign off
+      </div>
+
+      <div style="margin-top:56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
+        <div style="border:1px solid rgba(192,149,81,0.24);padding:36px 34px;display:flex;flex-direction:column;">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Start online</div>
+          <p style="margin:14px 0 0;flex:1;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(244,238,226,0.7);">Pick a tier, pay, and upload your logo and guest list in one pass. Ten minutes.</p>
+          <button sc-camel-on-click="{{ pickSponsor }}" style="margin-top:24px;align-self:flex-start;background:var(--fl-gold);color:#0B1521;border:none;font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:16px 30px;cursor:pointer;transition:background 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:#D4AF6A;">Choose a tier</button>
+        </div>
+        <div style="border:1px solid rgba(192,149,81,0.24);padding:36px 34px;display:flex;flex-direction:column;">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Talk to a person</div>
+          <p style="margin:14px 0 0;flex:1;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(244,238,226,0.7);">At the top tiers there is usually something to work out. Call and we will build it around you.</p>
+          <div style="margin-top:24px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;letter-spacing:0.04em;color:rgba(244,238,226,0.86);">
+            <span style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Reign Bach, Everest Collective</span>
+            <span>reign.bach@everestcollective.com</span>
+            <span>(541) 480-0759</span>
+          </div>
+          <a href="{{ onepagerUrl }}" style="margin-top:22px;font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--fl-gold);border-bottom:1px dotted rgba(192,149,81,0.7);padding-bottom:4px;align-self:flex-start;">Download the sponsorship one-pager</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="evening" style="background:var(--fl-ivory);color:var(--fl-ink);padding:clamp(72px,9vw,120px) clamp(20px,4vw,32px);">
+    <div style="max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;gap:clamp(28px,5vw,80px);justify-content:space-between;">
+      <div style="flex:1 1 280px;max-width:340px;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.34em;text-transform:uppercase;color:#7A5C24;">The evening</div>
+        <h2 style="margin:18px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(32px,3.6vw,46px);line-height:1.1;letter-spacing:0.01em;color:var(--fl-ink);">What kind of night this is</h2>
+        <div style="margin-top:26px;width:64px;height:2px;background:#C09551;"></div>
+      </div>
+      <div style="flex:2 1 440px;max-width:700px;display:flex;flex-direction:column;gap:26px;font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;line-height:1.62;color:rgba(21,30,40,0.86);text-wrap:pretty;">
+        <p style="margin:0;">Doors open at 6:30 and the first hour is standing room, drink in hand, no assigned seat. Everyone wears a badge with one line on it, the thing they could talk about for an hour without notes, and by 7:15 the room sounds like people who already know each other.</p>
+        <p style="margin:0;">Dinner is served at 7:30. Eight to a table, and the card at your place setting carries your name and that same line, so the people beside you have somewhere to start before the salad arrives.</p>
+        <p style="margin:0;">There is one giving moment during dinner, it is short and it is the reason we are all in the room, and gifts made there go to Pregnancy Help 4 U directly. Then the night goes back to being a night. Music after, and the bar stays open.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="venue" style="background:var(--fl-ivory);color:var(--fl-ink);padding:clamp(68px,9vw,112px) clamp(20px,4vw,32px);">
+    <div style="max-width:1240px;margin:0 auto;">
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:clamp(28px,5vw,80px);justify-content:space-between;">
+        <div style="flex:1 1 280px;max-width:340px;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:0.34em;text-transform:uppercase;color:#7A5C24;">Venue and logistics</div>
+          <h2 style="margin:18px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(32px,3.6vw,46px);line-height:1.1;color:var(--fl-ink);">The Reserve at Marty B's</h2>
+          <div style="margin-top:24px;font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;line-height:1.55;color:rgba(21,30,40,0.75);">
+            1001 I T Neely Rd<br>Bartonville, Texas
+          </div>
+          <a href="{{ mapUrl }}" target="_blank" rel="noopener" style="display:inline-block;margin-top:20px;font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:#7A5C24;border-bottom:1px solid rgba(138,106,46,0.5);padding-bottom:4px;">Open the map pin</a>
+        </div>
+        <div style="flex:2 1 440px;max-width:700px;display:flex;flex-direction:column;gap:34px;">
+          <div style="height:300px;border:1px solid rgba(21,30,40,0.14);overflow:hidden;">
+            <iframe title="Map to The Reserve at Marty B's" src="https://www.google.com/maps?q=The%20Reserve%20at%20Marty%20B%27s%20Bartonville%20TX&amp;output=embed" style="width:100%;height:100%;border:0;display:block;filter:saturate(0.75);" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:34px;">
+            <div>
+              <div style="font-size:10.5px;font-weight:500;letter-spacing:0.24em;text-transform:uppercase;color:rgba(21,30,40,0.72);">Parking</div>
+              <p style="margin:12px 0 0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(21,30,40,0.82);">Valet at the main entrance from 6:00. Self parking is on site and the walk is short and lit.</p>
+            </div>
+            <div>
+              <div style="font-size:10.5px;font-weight:500;letter-spacing:0.24em;text-transform:uppercase;color:rgba(21,30,40,0.72);">Staying over</div>
+              <p style="margin:12px 0 0;font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;line-height:1.55;color:rgba(21,30,40,0.82);">A block of rooms is held nearby under The Collective. <span style="border-bottom:1.5px dotted rgba(138,106,46,0.6);">Hotel and rate to confirm.</span></p>
+            </div>
+          </div>
+          <div style="border-left:3px solid #C09551;padding:6px 0 6px 28px;">
+            <div style="font-size:10.5px;font-weight:500;letter-spacing:0.24em;text-transform:uppercase;color:rgba(21,30,40,0.72);">What black tie, Texas means</div>
+            <p style="margin:14px 0 0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:27px;line-height:1.45;color:var(--fl-ink);text-wrap:pretty;">Black tie with a Texas accent. Tuxedos and gowns. Boots are welcome and so is turquoise.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="background:var(--fl-ivory);color:var(--fl-ink);padding:0 clamp(20px,4vw,32px) clamp(72px,9vw,120px);">
+    <div style="max-width:1240px;margin:0 auto;">
+      <div style="height:1px;background:rgba(21,30,40,0.12);"></div>
+      <div style="margin-top:clamp(56px,7vw,96px);display:flex;flex-wrap:wrap;align-items:flex-start;gap:clamp(28px,5vw,80px);justify-content:space-between;">
+        <div style="flex:1 1 280px;max-width:340px;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:0.34em;text-transform:uppercase;color:#7A5C24;">Questions</div>
+          <h2 style="margin:18px 0 0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:clamp(32px,3.6vw,46px);line-height:1.1;color:var(--fl-ink);">Before you ask</h2>
+        </div>
+        <div style="flex:2 1 440px;max-width:700px;border-top:1px solid rgba(21,30,40,0.14);">
+          <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="6">
+            <div style="border-bottom:1px solid rgba(21,30,40,0.14);">
+              <button sc-camel-on-click="{{ q.toggle }}" style="width:100%;background:none;border:none;padding:26px 0;display:flex;align-items:center;justify-content:space-between;gap:24px;cursor:pointer;text-align:left;">
+                <span style="font-family:'Marcellus',Georgia,serif;font-size:22px;line-height:1.3;color:var(--fl-ink);">{{ q.q }}</span>
+                <span style="flex:none;font-family:'Jost';font-size:22px;font-weight:300;color:#7A5C24;width:20px;text-align:center;">{{ q.sign }}</span>
+              </button>
+              <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;padding:0 clamp(0px,6vw,60px) 30px 0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.6;color:rgba(21,30,40,0.8);text-wrap:pretty;">{{ q.a }}</p>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:var(--fl-deep);border-top:1px solid rgba(192,149,81,0.2);padding:clamp(60px,7vw,88px) clamp(20px,4vw,32px) 56px;">
+    <div style="max-width:1240px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:30px;text-align:center;">
+        <div style="font-family:'Marcellus',Georgia,serif;font-size:clamp(12px,2.6vw,24px);letter-spacing:0.22em;text-indent:0.22em;color:var(--fl-ivory);">{{ titleLine }}</div>
+        <div style="font-size:11.5px;font-weight:300;letter-spacing:0.28em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Hosted and produced by</div>
+        <img src="/gala-img/56a06680-b000-48ea-b46a-8dbd13aa375f.png" alt="Everest Collective" style="height:clamp(28px,7vw,38px);width:auto;display:block;opacity:0.94;">
+        <div style="margin-top:6px;display:flex;flex-direction:column;align-items:center;gap:18px;">
+          <div style="font-size:11.5px;font-weight:300;letter-spacing:0.28em;text-transform:uppercase;color:var(--fl-gold);">Benefiting</div>
+          <a href="{{ ph4uUrl }}" target="_blank" rel="noopener" aria-label="Pregnancy Help 4 U, opens their website in a new tab" style="display:block;line-height:0;opacity:0.94;transition:opacity 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="opacity:1;">
+            <img src="/gala-img/7b70daec-5728-4f1d-825b-8fffe4ac17b4.png" alt="Pregnancy Help 4 U" style="height:clamp(30px,8vw,42px);width:auto;display:block;">
+          </a>
+        </div>
+      </div>
+
+      <sc-if value="{{ anySponsors }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:clamp(48px,6vw,72px);padding-top:clamp(40px,5vw,56px);border-top:1px solid rgba(192,149,81,0.2);display:flex;flex-direction:column;align-items:center;gap:clamp(32px,4vw,48px);">
+          <div style="font-size:11px;font-weight:400;letter-spacing:0.3em;text-transform:uppercase;color:rgba(244,238,226,0.66);">With thanks to our sponsors</div>
+
+          <sc-if value="{{ hasPresenting }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+              <div style="font-size:9.5px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:var(--fl-gold);">Presenting sponsor</div>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:36px;">
+                <sc-for list="{{ wallPresenting }}" as="s" hint-placeholder-count="1">
+                  <div style="width:min(300px,72vw);height:110px;">
+                    <image-slot id="{{ s.slot }}" shape="rect" fit="contain" placeholder="{{ s.company }}"></image-slot>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasGold }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+              <div style="font-size:9.5px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:var(--fl-gold);">Gold sponsors</div>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:28px;">
+                <sc-for list="{{ wallGold }}" as="s" hint-placeholder-count="3">
+                  <div style="width:min(210px,60vw);height:74px;">
+                    <image-slot id="{{ s.slot }}" shape="rect" fit="contain" placeholder="{{ s.company }}"></image-slot>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasSilver }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div style="font-size:9.5px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:rgba(244,238,226,0.62);">Silver sponsors</div>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 32px;">
+                <sc-for list="{{ wallSilver }}" as="s" hint-placeholder-count="3">
+                  <span style="font-family:'Marcellus',Georgia,serif;font-size:21px;letter-spacing:0.03em;color:rgba(244,238,226,0.9);">{{ s.company }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasBronze }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div style="font-size:9.5px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:rgba(244,238,226,0.62);">Bronze sponsors</div>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 26px;">
+                <sc-for list="{{ wallBronze }}" as="s" hint-placeholder-count="4">
+                  <span style="font-family:'Marcellus',Georgia,serif;font-size:16px;letter-spacing:0.03em;color:rgba(244,238,226,0.8);">{{ s.company }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <div style="margin-top:64px;height:1px;background:rgba(192,149,81,0.2);"></div>
+
+      <div style="margin-top:40px;display:flex;flex-wrap:wrap;gap:clamp(28px,4vw,48px);">
+        <div style="flex:2 1 320px;max-width:520px;font-family:'Cormorant Garamond',Georgia,serif;font-size:18.5px;line-height:1.6;color:rgba(244,238,226,0.6);">
+          Hosted and produced by Everest Collective. Benefiting Pregnancy Help 4 U, a registered 501(c)(3). 100% of the proceeds from the event will be donated to Pregnancy Help 4 U, and Everest Collective is paying for the venue and the set up costs. Ticket purchases are payments for admission to an Everest Collective event and are not charitable contributions to Pregnancy Help 4 U. No charitable tax receipt will be issued for ticket purchases.
+        </div>
+        <div style="flex:1 1 190px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.24em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Contact</div>
+          <a href="mailto:Reign.Bach@everestcollective.com" style="font-size:14px;color:rgba(244,238,226,0.82);">Reign.Bach@everestcollective.com</a>
+          <span style="font-size:14px;color:rgba(244,238,226,0.82);">541-480-0759</span>
+        </div>
+        <div style="flex:1 1 190px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:10.5px;font-weight:500;letter-spacing:0.24em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Dates</div>
+          <span style="font-size:14px;color:rgba(244,238,226,0.82);">Registration closes November 16</span>
+          <span style="font-size:14px;color:rgba(244,238,226,0.82);">Thursday, December 3, 2026</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  
