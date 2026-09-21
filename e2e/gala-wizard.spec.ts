@@ -91,3 +91,35 @@ test("6. the sponsor door lists the real tiers and requires a choice", async ({ 
   await expect(modal(page)).toContainText("Step 2 of 7");
   await expect(modal(page)).toContainText("Your company");
 });
+
+test("7. a guest can register end to end and gets a reference", async ({ page }) => {
+  await page.locator('#gala-content [data-act="pickGuest"]').first().click();
+
+  await page.locator('input[name="code"]').fill("COLLECTIVE-MIKE");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 2 of 4");
+  const stamp = Date.now();
+  await page.locator('input[name="first"]').fill("Playwright");
+  await page.locator('input[name="last"]').fill("Guest");
+  await page.locator('input[name="mobile"]').fill("214-555-0199");
+  await page.locator('input[name="email"]').fill(`pw+${stamp}@everestcollective.com`);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // connect step
+  await expect(modal(page)).toContainText("Step 3 of 4");
+  await page.locator('textarea, input[name="line"]').first()
+    .fill("Testing whether this registers a real person");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // The review step shows back what they typed, from the wizard's own
+  // state rather than from anything the server sent.
+  await expect(modal(page)).toContainText("Step 4 of 4");
+  await expect(modal(page)).toContainText("Playwright Guest");
+  await expect(modal(page)).toContainText("Mike Fromhold");
+
+  await page.getByRole("button", { name: "Complete registration" }).click();
+
+  // A reference beginning TCG- only exists if Postgres wrote the row.
+  await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/, { timeout: 15000 });
+});

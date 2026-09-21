@@ -86,6 +86,48 @@ export default function GalaWizard({
   const [codeInfo, setCodeInfo] = useState<CodeInfo>(null);
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [ref, setRef] = useState("");
+  const [token, setToken] = useState<string | null>(null);
+
+  const submit = useCallback(async (f: Form) => {
+    setSending(true);
+    try {
+      const body: Record<string, unknown> = {
+        door,
+        first_name: (f.first ?? "").trim(),
+        last_name: (f.last ?? "").trim(),
+        email: (f.email ?? "").trim(),
+        mobile: (f.mobile ?? "").trim(),
+        badge_name: (f.badge ?? "").trim() || null,
+        dietary: (f.dietary ?? "").trim() || null,
+        accessibility: (f.access ?? "").trim() || null,
+        line: (f.line ?? "").trim(),
+      };
+      if (door === "guest") body.code = (f.code ?? "").trim();
+
+      const res = await fetch("/api/gala/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }).then((r) => r.json()).catch(() => null);
+
+      if (res?.ok !== true) {
+        // Everything they typed stays on screen. Nobody retypes a form
+        // because our server had a bad moment.
+        setErr({
+          submit: res?.error ??
+            "We could not complete that. Nothing was charged. Write to Reign.Bach@everestcollective.com and we will finish it by hand.",
+        });
+        return;
+      }
+      setRef(res.data.reference);
+      setToken(res.data.ticket_token ?? null);
+      setDone(true);
+    } finally {
+      setSending(false);
+    }
+  }, [door]);
 
   const steps = door ? DOORS[door].steps : [];
   const key = door && step >= 0 && step < steps.length ? steps[step] : null;
@@ -94,9 +136,13 @@ export default function GalaWizard({
     const root = hostRef.current;
     if (root === null) return {};
     const out: Form = {};
-    root.querySelectorAll<HTMLInputElement>("input[name]").forEach((el) => {
-      out[el.name] = el.value;
-    });
+    root
+      .querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+        "input[name], textarea[name], select[name]",
+      )
+      .forEach((el) => {
+        out[el.name] = el.value;
+      });
     return out;
   }, []);
 
@@ -135,11 +181,34 @@ export default function GalaWizard({
     }
 
     if (key === "you") {
-      for (const f of YOU_HALF) {
-        if (f.req && (merged[f.name] ?? "").trim() === "") problems[f.name] = "Required";
+      const missing = YOU_HALF.filter(
+        (f) => f.req && (merged[f.name] ?? "").trim() === "",
+      );
+      for (const f of missing) problems[f.name] = "Required";
+      // A red border alone leaves someone hunting down the form for
+      // what is wrong. Say it, in the one slot this step renders.
+      if (missing.length > 0) {
+        problems.you = `We need ${missing.map((f) => f.label.toLowerCase()).join(", ")}.`;
       }
-      if ((merged.line ?? "").trim().length < 8) {
-        problems.line = "We need your line. Specific beats short.";
+    }
+
+    // The line is asked on the connect step, not here. Checking it on
+    // the you step meant it was always empty, so Continue refused with
+    // a message whose only slot lives on a step nobody had reached.
+    // Every door was stuck on step 2 with nothing on screen.
+    if (key === "connect" && (merged.line ?? "").trim().length < 8) {
+      problems.line = "We need your line. Specific beats short.";
+    }
+
+    // The plus-one was never checked at all, so the seat door would
+    // take a blank guest and put a nameless badge on a table.
+    if (key === "guest") {
+      const missing = GUEST_HALF.filter(
+        (f) => f.req && (merged[f.name] ?? "").trim() === "",
+      );
+      for (const f of missing) problems[f.name] = "Required";
+      if (missing.length > 0) {
+        problems.guest = `We need ${missing.map((f) => f.label.toLowerCase()).join(", ")}.`;
       }
     }
 
@@ -149,19 +218,27 @@ export default function GalaWizard({
     }
 
     if (key === "company") {
-      for (const f of COMPANY_FIELDS) {
-        if (f.req && (merged[f.name] ?? "").trim() === "") problems[f.name] = "Required";
+      const missing = COMPANY_FIELDS.filter(
+        (f) => f.req && (merged[f.name] ?? "").trim() === "",
+      );
+      for (const f of missing) problems[f.name] = "Required";
+      if (missing.length > 0) {
+        problems.company = `We need ${missing.map((f) => f.label.toLowerCase()).join(", ")}.`;
       }
     }
 
     if (Object.keys(problems).length > 0) { setErr(problems); return; }
 
     setErr({});
+    // Review is the last step for a door that does not pay, so Continue
+    // there is the registration itself, not a page turn.
+    if (key === "review" && !steps.includes("pay")) { await submit(merged); return; }
+
     if (step + 1 >= steps.length) { setDone(true); } else { setStep((s) => s + 1); }
-    // tierId belongs here. Without it next() closes over the value from
-    // when it was created, which is null, so choosing a tier highlights
-    // the card and then Continue refuses anyway.
-  }, [form, harvest, key, step, steps.length, tierId]);
+    // tierId and submit both belong here. Without tierId, next() closes
+    // over the value from when it was created, which is null.
+  }, [form, harvest, key, step, steps, submit, tierId]);
+
 
   const actions = useMemo<Record<string, () => void>>(() => ({
     close,
@@ -187,6 +264,7 @@ export default function GalaWizard({
       border: on ? GOLD : "rgba(192,149,81,0.3)",
       color: on ? IVORY : DIM,
     });
+    const chosenTier = tiers.find((t) => t.id === tierId) ?? null;
     const s1 = tog(seats === 1), s2 = tog(seats === 2);
     const gY = tog(hasGuest === true), gN = tog(hasGuest === false);
     const em = tog(rosterByEmail), cm = tog(!rosterByEmail);
@@ -214,7 +292,9 @@ export default function GalaWizard({
       showPay: !done && key === "pay",
       showDone: done,
       showNav: !done && door !== null,
-      nextLabel: key === "review" || key === "pay" ? "Complete registration" : "Continue",
+      nextLabel: sending
+        ? "Registering..."
+        : key === "review" || key === "pay" ? "Complete registration" : "Continue",
 
       youHalf: withValues(YOU_HALF, form, err),
       youFull: withValues(YOU_FULL, form, err),
@@ -260,14 +340,33 @@ export default function GalaWizard({
       })),
 
       // Not wired yet. Empty renders nothing rather than crashing.
-      hostOptions: [], rosterRows: [], summary: [],
+      // What they are about to confirm. Blank answers are dropped
+      // rather than shown as empty rows.
+      summary: ([
+        ["Name", `${form.first ?? ""} ${form.last ?? ""}`.trim()],
+        ["Email", form.email ?? ""],
+        ["Mobile", form.mobile ?? ""],
+        ["Badge", form.badge ?? ""],
+        ["Company", form.company ?? ""],
+        ["Title", form.title ?? ""],
+        ["Host", door === "guest" ? (codeInfo?.hostName ?? "") : ""],
+        ["Tier", chosenTier ? `${chosenTier.name}, ${chosenTier.amount}` : ""],
+        ["Dietary", form.dietary ?? ""],
+        ["Accessibility", form.access ?? ""],
+        ["Your line", line],
+      ] as Array<[string, string]>)
+        .filter(([, v]) => v !== "")
+        .map(([k, v]) => ({ k, v })),
+
+      errSubmit: err.submit ?? "",
+      hostOptions: [], rosterRows: [],
       rosterN: "", rosterLabel: "", rosterFilled: "",
       payAmount: "", payLabel: "",
-      doneEmail: form.email ?? "", doneGuest: "", doneLine: line,
+      doneEmail: form.email ?? "", doneGuest: "", doneLine: ref,
       calendarUrl: "#",
     };
   }, [open, door, step, key, steps.length, form, err, seats, hasGuest,
-      rosterByEmail, codeInfo, done, tiers, tierId]);
+      rosterByEmail, codeInfo, done, tiers, tierId, sending, ref]);
 
   const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
 
