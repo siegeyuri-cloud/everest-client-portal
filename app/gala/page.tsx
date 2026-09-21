@@ -2,8 +2,9 @@ import fs from "fs";
 import path from "path";
 import type { Metadata } from "next";
 import { createServiceClient } from "@/lib/supabaseService";
-import { render } from "@/lib/gala/template";
+import { render, prepare } from "@/lib/gala/template";
 import GalaAccordion from "./GalaAccordion";
+import GalaWizard from "./GalaWizard";
 import "./gala.css";
 
 /**
@@ -140,13 +141,21 @@ export default async function GalaPage() {
     wallBronze,
   };
 
-  const tplPath = path.join(process.cwd(), "app/gala/static.template.html");
-  const html = render(fs.readFileSync(tplPath, "utf8"), scope);
+  const dir = path.join(process.cwd(), "app/gala");
+
+  // prepare() must run on the TEMPLATE, before render(). Rendering first
+  // collapses {{ openDoors }} to an empty string, and then there is no
+  // handler attribute left for prepare to rewrite, so the RSVP buttons
+  // end up inert. That was the bug.
+  const staticTpl = prepare(fs.readFileSync(path.join(dir, "static.template.html"), "utf8"));
+  const pageHtml = render(staticTpl, scope);
+  const modalTpl = fs.readFileSync(path.join(dir, "modal.template.html"), "utf8");
 
   return (
     <>
-      <div id="gala-content" dangerouslySetInnerHTML={{ __html: html }} />
+      <div id="gala-content" dangerouslySetInnerHTML={{ __html: pageHtml }} />
       <GalaAccordion />
+      <GalaWizard template={modalTpl} />
     </>
   );
 }

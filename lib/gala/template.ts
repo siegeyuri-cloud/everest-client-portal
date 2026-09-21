@@ -17,6 +17,22 @@
 
 export type Scope = Record<string, unknown>;
 
+/**
+ * Rewrite the template's handler attributes into something a delegated
+ * click listener can read, and drop the change handlers, which the
+ * wizard deliberately does not use.
+ *
+ * Lives here rather than in the wizard because the server needs it too:
+ * the page's own RSVP buttons carry the same attributes and have to be
+ * rewritten before the HTML is sent.
+ */
+export function prepare(tpl: string): string {
+  return tpl
+    .replace(/sc-camel-on-click="\{\{\s*([^}]+?)\s*\}\}"/g,
+      (_m, n) => `data-act="${String(n).trim()}"`)
+    .replace(/sc-camel-on-change="\{\{[^}]*\}\}"/g, "");
+}
+
 function lookup(path: string, scope: Scope): unknown {
   const clean = path.trim();
   if (clean === "true") return true;
