@@ -300,6 +300,27 @@ export default function GalaWizard({
     const gY = tog(hasGuest === true), gN = tog(hasGuest === false);
     const em = tog(rosterByEmail), cm = tog(!rosterByEmail);
 
+    // Seats to fill besides their own. A host table seats ten; a
+    // sponsorship brings whatever its tier includes.
+    const rosterN = door === "host" ? 9
+      : door === "sponsor" ? Math.max((chosenTier?.seats ?? 10) - 1, 0)
+      : 0;
+
+    // One row per seat. The field names are what harvest() picks up,
+    // so the row inputs need no handlers of their own.
+    const rosterRows = Array.from({ length: rosterN }, (_, i) => ({
+      n: String(i + 1),
+      nameField: `rosterName${i}`,
+      emailField: `rosterEmail${i}`,
+      name: form[`rosterName${i}`] ?? "",
+      email: form[`rosterEmail${i}`] ?? "",
+      code: "Sent with their invitation",
+    }));
+
+    const rosterFilled = rosterRows.filter(
+      (r) => (form[r.nameField] ?? "").trim() !== "",
+    ).length;
+
     return {
       open,
       // Boolean, not a handler: it gates the door-picking screen.
@@ -328,6 +349,15 @@ export default function GalaWizard({
         : key === "review" ? "Complete registration"
         : key === "pay" ? "Done for now"
         : "Continue",
+
+      rosterLabel: door === "sponsor" ? "Who is coming with you" : "Fill your table",
+      rosterN: String(rosterN),
+      rosterRows,
+      rosterFilled: String(rosterFilled),
+      rosterByEmail,
+      showCodes: !rosterByEmail,
+      emailModeBg: em.bg, emailModeBorder: em.border,
+      codeModeBg: cm.bg, codeModeBorder: cm.border,
 
       payLabel: door === "sponsor" ? "Sponsorship" : door === "host" ? "Table" : "Seats",
       payAmount: amountCents > 0
@@ -398,9 +428,7 @@ export default function GalaWizard({
         .map(([k, v]) => ({ k, v })),
 
       errSubmit: err.submit ?? "",
-      hostOptions: [], rosterRows: [],
-      rosterN: "", rosterLabel: "", rosterFilled: "",
-      payAmount: "", payLabel: "",
+      hostOptions: [],
       doneEmail: form.email ?? "", doneGuest: "", doneLine: ref,
       calendarUrl: "#",
     };

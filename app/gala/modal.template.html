@@ -172,9 +172,9 @@
                 <sc-for list="{{ rosterRows }}" as="r" hint-placeholder-count="9">
                   <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(192,149,81,0.12);">
                     <span style="flex:none;width:22px;font-family:'Marcellus',Georgia,serif;font-size:15px;color:rgba(244,238,226,0.66);">{{ r.n }}</span>
-                    <input type="text" value="{{ r.name }}" sc-camel-on-change="{{ r.onName }}" placeholder="Guest name" style="flex:1 1 130px;min-width:0;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:15px;padding:13px 14px;outline:none;">
+                    <input type="text" name="{{ r.nameField }}" value="{{ r.name }}" placeholder="Guest name" style="flex:1 1 130px;min-width:0;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:15px;padding:13px 14px;outline:none;">
                     <sc-if value="{{ rosterByEmail }}" hint-placeholder-val="{{ true }}">
-                      <input type="email" value="{{ r.email }}" sc-camel-on-change="{{ r.onEmail }}" placeholder="Their email" style="flex:1 1 150px;min-width:0;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:15px;padding:13px 14px;outline:none;">
+                      <input type="email" name="{{ r.emailField }}" value="{{ r.email }}" placeholder="Their email" style="flex:1 1 150px;min-width:0;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:15px;padding:13px 14px;outline:none;">
                     </sc-if>
                     <sc-if value="{{ showCodes }}" hint-placeholder-val="{{ false }}">
                       <span style="flex:1 1 150px;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;letter-spacing:0.04em;color:var(--fl-gold);word-break:break-all;">{{ r.code }}</span>
@@ -312,7 +312,7 @@
           </sc-if>
 
           <sc-if value="{{ showPay }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;flex-direction:column;gap:24px;">
+            <div data-pay-panel style="display:flex;flex-direction:column;gap:24px;">
               <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Payment</h3>
               <div style="display:flex;align-items:baseline;justify-content:space-between;border:1px solid rgba(192,149,81,0.3);padding:24px 26px;">
                 <span style="font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.55);">{{ payLabel }}</span>

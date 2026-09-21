@@ -174,8 +174,11 @@ test("9. the host door registers and then shows what is owed", async ({ page }) 
   // hardcoded number in the wizard would not survive a price change
   // in gala_settings; this would catch that.
   await expect(modal(page)).toContainText("Step 6 of 6", { timeout: 15000 });
+  // Scoped to the pay panel on purpose. Asserting against the whole
+  // modal matched the hardcoded price in the table step, so this
+  // passed for a week while payAmount rendered empty.
   await expect(modal(page)).toContainText("Payment");
-  await expect(modal(page)).toContainText("$2,500");
+  await expect(page.locator("[data-pay-panel]")).toContainText("$2,500");
 
   // And finishing lands on the confirmation with a real reference.
   await page.getByRole("button", { name: "Done for now" }).click();
@@ -218,7 +221,8 @@ test("10. the sponsor door carries the chosen tier's price into pay", async ({ p
   await page.getByRole("button", { name: "Complete registration" }).click();
 
   await expect(modal(page)).toContainText("Step 7 of 7", { timeout: 15000 });
-  await expect(modal(page)).toContainText("Sponsorship");
+  await expect(page.locator("[data-pay-panel]")).toContainText("Sponsorship");
+  await expect(page.locator("[data-pay-panel]")).toContainText("$1,000");
 
   await page.getByRole("button", { name: "Done for now" }).click();
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
@@ -260,7 +264,7 @@ test("11. the seat door sends the plus-one as its own person", async ({ page }) 
   await page.getByRole("button", { name: "Complete registration" }).click();
 
   await expect(modal(page)).toContainText("Step 6 of 6", { timeout: 15000 });
-  await expect(modal(page)).toContainText("Seats");
+  await expect(page.locator("[data-pay-panel]")).toContainText("Seats");
 
   await page.getByRole("button", { name: "Done for now" }).click();
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
