@@ -28,8 +28,16 @@ export type Scope = Record<string, unknown>;
  */
 export function prepare(tpl: string): string {
   return tpl
-    .replace(/sc-camel-on-click="\{\{\s*([^}]+?)\s*\}\}"/g,
-      (_m, n) => `data-act="${String(n).trim()}"`)
+    .replace(/sc-camel-on-click="\{\{\s*([^}]+?)\s*\}\}"/g, (_m, n) => {
+      const name = String(n).trim();
+      // A dotted binding is scoped to a loop item, so every row would
+      // otherwise emit the same literal action. Leaving it as a binding
+      // lets render() fill in that row's own value, and the row carries
+      // something like "tier:silver" for the listener to parse.
+      return name.includes(".")
+        ? `data-act="{{ ${name} }}"`
+        : `data-act="${name}"`;
+    })
     .replace(/sc-camel-on-change="\{\{[^}]*\}\}"/g, "");
 }
 

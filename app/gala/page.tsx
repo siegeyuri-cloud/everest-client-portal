@@ -53,8 +53,7 @@ export default async function GalaPage() {
     supabase
       .from("gala_sponsors")
       .select("id, legal_name, recognition_name, tier_id, status, show_on_wall")
-      .eq("status", "confirmed")
-      .eq("show_on_wall", true),
+      .eq("status", "confirmed"),
   ]);
 
   const s = settingsRes.data;
@@ -76,6 +75,9 @@ export default async function GalaPage() {
   // Tier availability, counted from real sponsors rather than asserted.
   const takenByTier = new Map<string, number>();
   for (const sp of sponsors) {
+    // Every confirmed sponsor counts against the cap. Opting off the
+    // wall is a recognition preference, not a reason to sell the same
+    // Presenting slot twice.
     if (sp.tier_id) takenByTier.set(sp.tier_id, (takenByTier.get(sp.tier_id) ?? 0) + 1);
   }
 
@@ -97,6 +99,7 @@ export default async function GalaPage() {
   // their recognition name, which is better than an empty rectangle.
   const byTierName = (name: string) =>
     sponsors
+      .filter((sp) => sp.show_on_wall)
       .filter((sp) => tiers.find((t) => t.id === sp.tier_id)?.name === name)
       .map((sp) => ({ company: sp.recognition_name ?? sp.legal_name, slot: `sponsor-${sp.id}` }));
 
