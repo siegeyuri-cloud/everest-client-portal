@@ -123,3 +123,23 @@ test("7. a guest can register end to end and gets a reference", async ({ page })
   // A reference beginning TCG- only exists if Postgres wrote the row.
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/, { timeout: 15000 });
 });
+
+test("8. the FAQ accordion opens and closes", async ({ page }) => {
+  // The accordion binds to buttons by their sibling paragraph, not by
+  // data-act, so the prepare() change left it working. This test is
+  // here so the next change to that transform cannot break it quietly.
+  const idx = await page.$$eval("#gala-content button", (els) =>
+    els.findIndex((b) => b.nextElementSibling?.tagName === "P"),
+  );
+  expect(idx).toBeGreaterThanOrEqual(0);
+
+  const btn = page.locator("#gala-content button").nth(idx);
+  const answer = page.locator("#gala-content button + p").first();
+
+  // Shut on load, open on click, shut again.
+  await expect(answer).toBeHidden();
+  await btn.click();
+  await expect(answer).toBeVisible();
+  await btn.click();
+  await expect(answer).toBeHidden();
+});
