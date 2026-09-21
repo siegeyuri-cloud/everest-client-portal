@@ -69,3 +69,25 @@ test("5. back from the first step returns to the door picker", async ({ page }) 
   await page.getByRole("button", { name: "Back" }).click();
   await expect(modal(page)).toContainText("Choose a door");
 });
+
+test("6. the sponsor door lists the real tiers and requires a choice", async ({ page }) => {
+  await page.locator('#gala-content [data-act="pickSponsor"]').first().click();
+  await expect(modal(page)).toContainText("Step 1 of 7");
+
+  // The four tiers come from gala_tiers, not from the prototype's
+  // hardcoded array. Prices are the ones in the database.
+  await expect(modal(page)).toContainText("Presenting Sponsor");
+  await expect(modal(page)).toContainText("$15,000");
+  await expect(modal(page)).toContainText("Bronze Sponsor");
+
+  // Continue with nothing chosen is refused.
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(modal(page)).toContainText("Choose a tier to continue");
+  await expect(modal(page)).toContainText("Step 1 of 7");
+
+  // Choosing one and continuing moves to the company step.
+  await page.locator('[data-act^="tier:"]').first().click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(modal(page)).toContainText("Step 2 of 7");
+  await expect(modal(page)).toContainText("Your company");
+});

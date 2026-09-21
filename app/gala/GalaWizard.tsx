@@ -48,7 +48,30 @@ function withValues(fields: Field[], form: Form, err: Record<string, string>) {
   }));
 }
 
-export default function GalaWizard({ template }: { template: string }) {
+export type WizardTier = {
+  id: string;
+  name: string;
+  amount: string;
+  amountCents: number;
+  seats: string;
+  seatCount: number;
+  recognition: string;
+  availability: string;
+  availColor: string;
+  soldOut: boolean;
+  pick: string;
+  cursor: string;
+  nameColor: string;
+  takenList: string;
+};
+
+export default function GalaWizard({
+  template,
+  tiers,
+}: {
+  template: string;
+  tiers: WizardTier[];
+}) {
   const tpl = useMemo(() => prepare(template), [template]);
   const hostRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +82,7 @@ export default function GalaWizard({ template }: { template: string }) {
   const [seats, setSeats] = useState(1);
   const [hasGuest, setHasGuest] = useState<boolean | null>(null);
   const [rosterByEmail, setRosterByEmail] = useState(true);
+  const [tierId, setTierId] = useState<string | null>(null);
   const [codeInfo, setCodeInfo] = useState<CodeInfo>(null);
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
@@ -119,6 +143,11 @@ export default function GalaWizard({ template }: { template: string }) {
       }
     }
 
+    if (key === "tier" && tierId === null) {
+      setErr({ tier: "Choose a tier to continue." });
+      return;
+    }
+
     if (key === "company") {
       for (const f of COMPANY_FIELDS) {
         if (f.req && (merged[f.name] ?? "").trim() === "") problems[f.name] = "Required";
@@ -129,7 +158,10 @@ export default function GalaWizard({ template }: { template: string }) {
 
     setErr({});
     if (step + 1 >= steps.length) { setDone(true); } else { setStep((s) => s + 1); }
-  }, [form, harvest, key, step, steps.length]);
+    // tierId belongs here. Without it next() closes over the value from
+    // when it was created, which is null, so choosing a tier highlights
+    // the card and then Continue refuses anyway.
+  }, [form, harvest, key, step, steps.length, tierId]);
 
   const actions = useMemo<Record<string, () => void>>(() => ({
     close,
@@ -221,15 +253,21 @@ export default function GalaWizard({ template }: { template: string }) {
       // The guest door never charges, whatever the code's own flag says.
       isComp: door === "guest",
 
+      tierChoices: tiers.map((t) => ({
+        ...t,
+        bg: t.id === tierId ? "rgba(192,149,81,0.16)" : "transparent",
+        border: t.id === tierId ? GOLD : "rgba(192,149,81,0.3)",
+      })),
+
       // Not wired yet. Empty renders nothing rather than crashing.
-      tierChoices: [], hostOptions: [], rosterRows: [], summary: [],
+      hostOptions: [], rosterRows: [], summary: [],
       rosterN: "", rosterLabel: "", rosterFilled: "",
       payAmount: "", payLabel: "",
       doneEmail: form.email ?? "", doneGuest: "", doneLine: line,
       calendarUrl: "#",
     };
   }, [open, door, step, key, steps.length, form, err, seats, hasGuest,
-      rosterByEmail, codeInfo, done]);
+      rosterByEmail, codeInfo, done, tiers, tierId]);
 
   const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
 
@@ -241,11 +279,26 @@ export default function GalaWizard({ template }: { template: string }) {
       const el = t ? t.closest("[data-act]") : null;
       if (el === null) return;
       const act = el.getAttribute("data-act");
-      if (act !== null && actions[act]) { e.preventDefault(); actions[act](); }
+      if (act === null || act === "") return;
+
+      if (act.startsWith("tier:")) {
+        e.preventDefault();
+        const id = act.slice(5);
+        // Only a tier that is actually on offer. A sold out row carries
+        // an empty action and returns above, but this also refuses an
+        // id that no longer matches a live tier.
+        if (tiers.some((t) => t.id === id && !t.soldOut)) {
+          setTierId(id);
+          setErr({});
+        }
+        return;
+      }
+
+      if (actions[act]) { e.preventDefault(); actions[act](); }
     };
     root.addEventListener("click", onClick);
     return () => root.removeEventListener("click", onClick);
-  }, [actions]);
+  }, [actions, tiers]);
 
   // The page's own buttons live in server-rendered HTML outside this
   // component, so they are wired from here.

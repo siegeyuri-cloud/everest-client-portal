@@ -185,7 +185,7 @@ export default async function GalaPage() {
     <>
       <div id="gala-content" dangerouslySetInnerHTML={{ __html: pageHtml }} />
       <GalaAccordion />
-      <GalaWizard template={modalTpl} />
+      <GalaWizard template={modalTpl} tiers={tierRows} />
     </>
   );
 }
