@@ -143,3 +143,41 @@ test("8. the FAQ accordion opens and closes", async ({ page }) => {
   await btn.click();
   await expect(answer).toBeHidden();
 });
+
+test("9. the host door registers and then shows what is owed", async ({ page }) => {
+  await page.locator('#gala-content [data-act="pickHost"]').first().click();
+  await expect(modal(page)).toContainText("Step 1 of 6");
+
+  const stamp = Date.now();
+  await page.locator('input[name="tableName"]').fill(`PW Table ${stamp}`);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 2 of 6");
+  await page.locator('input[name="first"]').fill("Playwright");
+  await page.locator('input[name="last"]').fill("Host");
+  await page.locator('input[name="mobile"]').fill("214-555-0177");
+  await page.locator('input[name="email"]').fill(`pwhost+${stamp}@everestcollective.com`);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 3 of 6");
+  await page.locator('input[name="line"]').fill("Why the family firm still argues about 1998");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Roster is step 4 and is skippable by design.
+  await expect(modal(page)).toContainText("Step 4 of 6");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 5 of 6");
+  await page.getByRole("button", { name: "Complete registration" }).click();
+
+  // Registering moves to pay and shows the price the SERVER set. A
+  // hardcoded number in the wizard would not survive a price change
+  // in gala_settings; this would catch that.
+  await expect(modal(page)).toContainText("Step 6 of 6", { timeout: 15000 });
+  await expect(modal(page)).toContainText("Payment");
+  await expect(modal(page)).toContainText("$2,500");
+
+  // And finishing lands on the confirmation with a real reference.
+  await page.getByRole("button", { name: "Done for now" }).click();
+  await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/);
+});

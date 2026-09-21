@@ -89,6 +89,8 @@ export default function GalaWizard({
   const [sending, setSending] = useState(false);
   const [ref, setRef] = useState("");
   const [token, setToken] = useState<string | null>(null);
+  const [amountCents, setAmountCents] = useState(0);
+  const [comped, setComped] = useState(false);
 
   const submit = useCallback(async (f: Form) => {
     setSending(true);
@@ -119,11 +121,13 @@ export default function GalaWizard({
           submit: res?.error ??
             "We could not complete that. Nothing was charged. Write to Reign.Bach@everestcollective.com and we will finish it by hand.",
         });
-        return;
+        return false;
       }
       setRef(res.data.reference);
       setToken(res.data.ticket_token ?? null);
-      setDone(true);
+      setAmountCents(res.data.amount_cents ?? 0);
+      setComped(res.data.status === "comped");
+      return true;
     } finally {
       setSending(false);
     }
@@ -230,9 +234,19 @@ export default function GalaWizard({
     if (Object.keys(problems).length > 0) { setErr(problems); return; }
 
     setErr({});
-    // Review is the last step for a door that does not pay, so Continue
-    // there is the registration itself, not a page turn.
-    if (key === "review" && !steps.includes("pay")) { await submit(merged); return; }
+    // Review is where the registration is actually created, on every
+    // door. A door that pays then shows the amount the server worked
+    // out, so the price on screen is never a second guess at it.
+    if (key === "review") {
+      const ok = await submit(merged);
+      if (!ok) return;
+      if (steps.includes("pay")) { setStep((s) => s + 1); } else { setDone(true); }
+      return;
+    }
+
+    // Payment is not wired to a provider yet, so finishing here records
+    // the registration as pending and tells them an invoice follows.
+    if (key === "pay") { setDone(true); return; }
 
     if (step + 1 >= steps.length) { setDone(true); } else { setStep((s) => s + 1); }
     // tierId and submit both belong here. Without tierId, next() closes
@@ -294,7 +308,15 @@ export default function GalaWizard({
       showNav: !done && door !== null,
       nextLabel: sending
         ? "Registering..."
-        : key === "review" || key === "pay" ? "Complete registration" : "Continue",
+        : key === "review" ? "Complete registration"
+        : key === "pay" ? "Done for now"
+        : "Continue",
+
+      payLabel: door === "sponsor" ? "Sponsorship" : door === "host" ? "Table" : "Seats",
+      payAmount: amountCents > 0
+        ? `$${(amountCents / 100).toLocaleString("en-US")}`
+        : "To be confirmed",
+      isComp: comped,
 
       youHalf: withValues(YOU_HALF, form, err),
       youFull: withValues(YOU_FULL, form, err),
@@ -366,7 +388,7 @@ export default function GalaWizard({
       calendarUrl: "#",
     };
   }, [open, door, step, key, steps.length, form, err, seats, hasGuest,
-      rosterByEmail, codeInfo, done, tiers, tierId, sending, ref]);
+      rosterByEmail, codeInfo, done, tiers, tierId, sending, ref, amountCents, comped]);
 
   const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
 
