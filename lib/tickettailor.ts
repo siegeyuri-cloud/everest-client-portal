@@ -103,8 +103,9 @@ export function buildCheckoutUrl(opts: {
 }): string | null {
   if (!isCheckoutConfigured()) return null;
 
-  const base = ttConfig.boxOfficeUrl!.replace(/\/+$/, "");
-  const url = new URL(`${base}/${ttConfig.eventId}`);
+  // The box office URL is already the event page. Appending eventId
+  // gives a dead link; checked against the live site by hand.
+  const url = new URL(ttConfig.boxOfficeUrl!.replace(/\/+$/, ""));
 
   url.searchParams.set(REFERENCE_PARAM, opts.reference);
   if (opts.email) url.searchParams.set("email", opts.email);

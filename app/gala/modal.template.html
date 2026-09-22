@@ -315,10 +315,18 @@
                 <span style="font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.55);">{{ payLabel }}</span>
                 <span style="font-family:'Marcellus',Georgia,serif;font-size:34px;color:var(--fl-gold);">{{ payAmount }}</span>
               </div>
-              <div style="border:1px dashed rgba(192,149,81,0.45);background:rgba(192,149,81,0.05);padding:30px 26px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">Checkout embeds here</span>
-                <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.55;color:rgba(244,238,226,0.62);max-width:400px;">Checkout runs in Everest Collective's name, because this is an Everest Collective event. Everything collected here is donated to Pregnancy Help 4 U.</span>
-              </div>
+              <sc-if value="{{ showCheckout }}" hint-placeholder-val="{{ true }}">
+                <div style="border:1px solid rgba(192,149,81,0.45);background:rgba(192,149,81,0.05);padding:30px 26px;display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center;">
+                  <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.55;color:rgba(244,238,226,0.72);max-width:430px;">On the next page choose <strong style="color:var(--fl-gold);font-weight:400;">{{ bundleName }}</strong>. Your reference {{ ref }} travels with you, so we can match the payment to this registration.</span>
+                  <a href="{{ checkoutUrl }}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:var(--fl-gold);color:#0B1521;font-size:12px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;padding:17px 34px;min-height:44px;text-decoration:none;">Pay {{ payAmount }}</a>
+                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.55);max-width:430px;">Checkout runs in Everest Collective's name, because this is an Everest Collective event. Everything collected is donated to Pregnancy Help 4 U.</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ showNoCheckout }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px solid rgba(224,162,94,0.45);background:rgba(224,162,94,0.07);padding:26px;display:flex;flex-direction:column;gap:10px;text-align:center;">
+                  <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.55;color:rgba(244,238,226,0.78);">Your place is held. Reign will email you a payment link within one working day, quoting {{ ref }}.</span>
+                </div>
+              </sc-if>
               <p style="margin:0;font-size:12.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.66);">This is a payment for admission to an Everest Collective event, not a charitable contribution, so no tax receipt will be issued for it. Nothing is held until payment clears. Registration closes November 16 and the seating chart is built the week after, which is why the date is hard.</p>
             </div>
           </sc-if>

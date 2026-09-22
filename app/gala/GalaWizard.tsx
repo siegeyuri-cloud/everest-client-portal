@@ -88,6 +88,7 @@ export default function GalaWizard({
   const [tierId, setTierId] = useState<string | null>(null);
   const [codeInfo, setCodeInfo] = useState<CodeInfo>(null);
   const [hostCode, setHostCode] = useState<string | null>(null);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [err, setErr] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
   const [sending, setSending] = useState(false);
@@ -167,6 +168,7 @@ export default function GalaWizard({
       setAmountCents(res.data.amount_cents ?? 0);
       setComped(res.data.status === "comped");
       setHostCode(res.data.host_code ?? null);
+      setCheckoutUrl(res.data.checkout_url ?? null);
       return true;
     } finally {
       setSending(false);
@@ -373,6 +375,9 @@ export default function GalaWizard({
         : key === "pay" ? "Done for now"
         : "Continue",
 
+      checkoutUrl: checkoutUrl ?? "",
+      showCheckout: checkoutUrl !== null,
+      showNoCheckout: checkoutUrl === null,
       showHostCode: done && hostCode !== null,
       hostCodeLabel: door === "sponsor" ? "Your guest code" : "Your table code",
       hostCode: hostCode ?? "",
@@ -391,6 +396,12 @@ export default function GalaWizard({
       showCodes: !rosterByEmail,
 
       payLabel: door === "sponsor" ? "Sponsorship" : door === "host" ? "Table" : "Seats",
+
+      // What to click on Ticket Tailor. Their bundle names, not ours.
+      bundleName: door === "host" ? "Table for Ten"
+        : door === "sponsor" ? (chosenTier?.name ?? "the sponsorship you chose")
+        : seats >= 2 ? "Two Seats"
+        : "One Seat",
       payAmount: amountCents > 0
         ? `$${(amountCents / 100).toLocaleString("en-US")}`
         : "To be confirmed",
@@ -464,7 +475,7 @@ export default function GalaWizard({
     };
   }, [open, door, step, key, steps.length, form, err, seats, hasGuest,
       rosterByEmail, codeInfo, done, tiers, tierId, sending, ref, amountCents, comped,
-      hostCode, hosts]);
+      hostCode, hosts, checkoutUrl]);
 
   const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
 

@@ -3,6 +3,7 @@ import { createServiceClient } from "@/lib/supabaseService";
 import { sendGalaConfirmation } from "@/lib/gala/email";
 import { notifyInternal } from "@/lib/gala/notify";
 import { syncToHubSpot } from "@/lib/gala/hubspot";
+import { buildCheckoutUrl } from "@/lib/tickettailor";
 
 /**
  * POST /api/gala/register — completes a gala registration.
@@ -241,7 +242,20 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true, data: { ...data, ticket_token: ticketToken } });
+  // Null when checkout is not configured, which the pay step reads as
+  // "show the fallback" rather than rendering a dead link.
+  const checkoutUrl = data?.requires_payment
+    ? buildCheckoutUrl({
+        reference: String(data.reference ?? ""),
+        email: String(body.email ?? "") || null,
+        name: [body.first_name, body.last_name].filter(Boolean).join(" ") || null,
+      })
+    : null;
+
+  return NextResponse.json({
+    ok: true,
+    data: { ...data, ticket_token: ticketToken, checkout_url: checkoutUrl },
+  });
 }
 
 export async function GET() {
