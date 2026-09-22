@@ -273,7 +273,26 @@ export default function GalaWizard({
       }
     }
 
-    if (Object.keys(problems).length > 0) { setErr(problems); return; }
+    if (Object.keys(problems).length > 0) {
+      setErr(problems);
+      // Let the error render first, then bring the first thing they
+      // still have to fill to the middle of the panel.
+      requestAnimationFrame(() => {
+        const root = hostRef.current;
+        if (root === null) return;
+        const fields = root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+          "input[name], textarea[name]",
+        );
+        for (const f of fields) {
+          if (f.value.trim() === "" && f.offsetParent !== null) {
+            f.scrollIntoView({ behavior: "smooth", block: "center" });
+            f.focus({ preventScroll: true });
+            return;
+          }
+        }
+      });
+      return;
+    }
 
     setErr({});
     // Review is where the registration is actually created, on every
