@@ -58,30 +58,31 @@ export function verifyWebhookSignature(
   rawBody: string,
   signatureHeader: string | null
 ): { valid: boolean; reason?: string } {
-  if (!ttConfig.webhookSecret) {
-    return { valid: false, reason: "NO_SECRET_CONFIGURED" };
+  const secret = ttConfig.webhookSecret;
+  if (!secret) return { valid: false, reason: "NO_SECRET_CONFIGURED" };
+  if (!signatureHeader) return { valid: false, reason: "NO_SIGNATURE_HEADER" };
+
+  // Ticket Tailor's form is "t=<unix time>,v1=<hex hmac>", signed over
+  // the timestamp followed by the raw body. A bare hex digest over the
+  // body alone is also accepted, in case the format turns out different.
+  const parts: Record<string, string> = {};
+  for (const piece of signatureHeader.split(",")) {
+    const i = piece.indexOf("=");
+    if (i > 0) parts[piece.slice(0, i).trim()] = piece.slice(i + 1).trim();
   }
-  if (!signatureHeader) {
-    return { valid: false, reason: "NO_SIGNATURE_HEADER" };
-  }
+  const provided = parts.v1 ?? parts.sha256 ?? signatureHeader.trim();
+  const t = parts.t;
 
-  // Tolerate a "sha256=..." style prefix if they use one.
-  const provided = signatureHeader.includes("=")
-    ? signatureHeader.split("=").pop()!.trim()
-    : signatureHeader.trim();
+  const hmac = (m: string) =>
+    crypto.createHmac("sha256", secret).update(m, "utf8").digest("hex");
+  const candidates = t ? [hmac(t + rawBody), hmac(rawBody)] : [hmac(rawBody)];
 
-  const expected = crypto
-    .createHmac("sha256", ttConfig.webhookSecret)
-    .update(rawBody, "utf8")
-    .digest("hex");
-
-  const a = Buffer.from(expected, "utf8");
   const b = Buffer.from(provided, "utf8");
-
-  if (a.length !== b.length) return { valid: false, reason: "LENGTH_MISMATCH" };
-  if (!crypto.timingSafeEqual(a, b)) return { valid: false, reason: "SIGNATURE_MISMATCH" };
-
-  return { valid: true };
+  for (const expected of candidates) {
+    const a = Buffer.from(expected, "utf8");
+    if (a.length === b.length && crypto.timingSafeEqual(a, b)) return { valid: true };
+  }
+  return { valid: false, reason: t ? "SIGNATURE_MISMATCH_TIMESTAMPED" : "SIGNATURE_MISMATCH" };
 }
 
 /**

@@ -33,11 +33,20 @@ export async function POST(req: Request) {
 
   // ---------- 1. signature ----------
   const signature =
+    req.headers.get("tickettailor-webhook-signature") ??
     req.headers.get("tickettailor-signature") ??
     req.headers.get("x-tickettailor-signature") ??
     req.headers.get("x-signature");
 
   const check = verifyWebhookSignature(raw, signature);
+  if (!check.valid) {
+    // Names only, never values, so the log shows which header they
+    // actually send without leaking the signature.
+    console.warn(
+      "[gala/webhook] rejected:", check.reason,
+      "headers:", Array.from(req.headers.keys()).join(","),
+    );
+  }
 
   if (!check.valid) {
     // In production an unverified webhook is refused outright. Anyone can
