@@ -49,7 +49,7 @@ type TierRow = {
 export default async function GalaPage() {
   const supabase = createServiceClient();
 
-  const [settingsRes, capacityRes, tiersRes, faqsRes, sponsorsRes] = await Promise.all([
+  const [settingsRes, capacityRes, tiersRes, faqsRes, sponsorsRes, hostsRes] = await Promise.all([
     supabase.from("gala_settings").select("*").eq("id", 1).single(),
     supabase.from("gala_capacity").select("*").maybeSingle(),
     supabase.from("gala_tiers").select("*").eq("active", true).order("sort_order"),
@@ -58,6 +58,17 @@ export default async function GalaPage() {
       .from("gala_sponsors")
       .select("id, legal_name, recognition_name, tier_id, status, show_on_wall")
       .eq("status", "confirmed"),
+    // A guest picking their host from a list beats typing a name we
+    // then have to match by hand. Only hosts with a table to fill.
+    supabase
+      .from("gala_hosts")
+      .select("full_name")
+      .not("full_name", "is", null)
+      .not("full_name", "ilike", "Playwright%")
+      .not("full_name", "ilike", "Fixture Host%")
+      .not("full_name", "ilike", "Probe Host%")
+      .not("full_name", "ilike", "Roster Check%")
+      .order("full_name"),
   ]);
 
   const s = settingsRes.data;
@@ -84,6 +95,15 @@ export default async function GalaPage() {
     // Presenting slot twice.
     if (sp.tier_id) takenByTier.set(sp.tier_id, (takenByTier.get(sp.tier_id) ?? 0) + 1);
   }
+
+  // The dropdown's first entry is the opt out, so a guest who does not
+  // know their host is not forced to name one.
+  const hostNames: string[] = [
+    "I do not know yet",
+    ...(hostsRes.data ?? [])
+      .map((h) => String(h.full_name ?? "").trim())
+      .filter((n) => n !== ""),
+  ];
 
   const tierRows = tiers.map((t) => {
     const taken = takenByTier.get(t.id) ?? 0;
@@ -185,7 +205,7 @@ export default async function GalaPage() {
     <>
       <div id="gala-content" dangerouslySetInnerHTML={{ __html: pageHtml }} />
       <GalaAccordion />
-      <GalaWizard template={modalTpl} tiers={tierRows} />
+      <GalaWizard template={modalTpl} tiers={tierRows} hosts={hostNames} />
     </>
   );
 }

@@ -214,11 +214,11 @@
                 </sc-for>
                 <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:9px;">
                   <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Table host, if you know</span>
-                  <sc-raw-select name="host" value="{{ vHost }}" sc-camel-on-change="{{ onField }}" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.3);color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;appearance:none;">
+                  <select name="host" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.3);color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;appearance:none;min-height:44px;">
                     <sc-for list="{{ hostOptions }}" as="h" hint-placeholder-count="3">
                       <option value="{{ h }}" style="background:#0B1521;color:#F4EEE2;">{{ h }}</option>
                     </sc-for>
-                  </sc-raw-select>
+                  </select>
                 </label>
               </div>
               <sc-if value="{{ errYou }}" hint-placeholder-val="{{ false }}">
@@ -257,7 +257,7 @@
                 <label style="display:flex;flex-direction:column;gap:10px;border-top:1px solid rgba(192,149,81,0.2);padding-top:22px;">
                   <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.5;color:rgba(244,238,226,0.84);">What could your guest talk about for an hour without any notes?</span>
                   <input type="text" name="gLine" value="{{ vGuestLine }}" sc-camel-on-change="{{ onField }}" sc-camel-max-length="60" placeholder="Their answer, not yours" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.4);color:var(--fl-ivory);font-size:17px;padding:16px 18px;outline:none;">
-                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.55);">This goes on their badge and their table card. If you are guessing, hand them your phone.</span>
+                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.55);">Required, and it goes on their badge and their table card. If you are guessing, hand them your phone.</span>
                 </label>
               </sc-if>
               <sc-if value="{{ errGuest }}" hint-placeholder-val="{{ false }}">

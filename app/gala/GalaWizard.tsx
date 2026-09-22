@@ -69,9 +69,11 @@ export type WizardTier = {
 export default function GalaWizard({
   template,
   tiers,
+  hosts,
 }: {
   template: string;
   tiers: WizardTier[];
+  hosts: string[];
 }) {
   const tpl = useMemo(() => prepare(template), [template]);
   const hostRef = useRef<HTMLDivElement>(null);
@@ -456,13 +458,13 @@ export default function GalaWizard({
         .map(([k, v]) => ({ k, v })),
 
       errSubmit: err.submit ?? "",
-      hostOptions: [],
+      hostOptions: hosts,
       doneEmail: form.email ?? "", doneGuest: "", doneLine: ref,
       calendarUrl: "#",
     };
   }, [open, door, step, key, steps.length, form, err, seats, hasGuest,
       rosterByEmail, codeInfo, done, tiers, tierId, sending, ref, amountCents, comped,
-      hostCode]);
+      hostCode, hosts]);
 
   const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
 
