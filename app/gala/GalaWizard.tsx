@@ -248,7 +248,11 @@ export default function GalaWizard({
 
     // The plus-one was never checked at all, so the seat door would
     // take a blank guest and put a nameless badge on a table.
-    if (key === "guest") {
+    if (key === "guest" && hasGuest === null) {
+      problems.guest = "Let us know whether you are bringing someone.";
+    }
+
+    if (key === "guest" && hasGuest === true) {
       const missing = GUEST_HALF.filter(
         (f) => f.req && (merged[f.name] ?? "").trim() === "",
       );
@@ -312,7 +316,7 @@ export default function GalaWizard({
     if (step + 1 >= steps.length) { setDone(true); } else { setStep((s) => s + 1); }
     // tierId and submit both belong here. Without tierId, next() closes
     // over the value from when it was created, which is null.
-  }, [form, harvest, key, step, steps, submit, tierId]);
+  }, [form, harvest, key, step, steps, submit, tierId, hasGuest]);
 
 
   const actions = useMemo<Record<string, () => void>>(() => ({

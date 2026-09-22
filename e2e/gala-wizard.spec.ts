@@ -142,6 +142,29 @@ test("7. a guest can register end to end and gets a reference", async ({ page })
   await expect(modal(page)).toContainText(/TCG-[A-Z0-9]{6}/, { timeout: 15000 });
 });
 
+test("13. coming alone does not ask for a guest", async ({ page }) => {
+  await page.locator('#gala-content [data-act="pickSeat"]').first().click();
+  await expect(modal(page)).toContainText("Step 1 of 6");
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  const stamp = Date.now();
+  await expect(modal(page)).toContainText("Step 2 of 6");
+  await page.locator('input[name="first"]').fill("Playwright");
+  await page.locator('input[name="last"]').fill("Alone");
+  await page.locator('input[name="mobile"]').fill("214-555-0166");
+  await page.locator('input[name="email"]').fill(`pwalone+${stamp}@everestcollective.com`);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  // Saying no should carry them straight past, with no guest fields
+  // rendered and nothing demanded of them.
+  await expect(modal(page)).toContainText("Step 3 of 6");
+  await page.locator('[data-act="guestNo"]').first().click();
+  await expect(page.locator('input[name="gFirst"]')).toHaveCount(0);
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  await expect(modal(page)).toContainText("Step 4 of 6");
+});
+
 test("8. the FAQ accordion opens and closes", async ({ page }) => {
   // The accordion binds to buttons by their sibling paragraph, not by
   // data-act, so the prepare() change left it working. This test is
