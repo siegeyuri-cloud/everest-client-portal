@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabaseService";
 import { sendGalaConfirmation } from "@/lib/gala/email";
 import { notifyInternal } from "@/lib/gala/notify";
+import { syncToHubSpot } from "@/lib/gala/hubspot";
 
 /**
  * POST /api/gala/register — completes a gala registration.
@@ -232,6 +233,12 @@ export async function POST(req: Request) {
       door === "host" ? "table_claimed" : "sponsor_committed",
       data.registration_id
     ).catch((e) => console.error("[gala/register] notify threw", e));
+  }
+
+  if (!isTest && data?.registration_id) {
+    syncToHubSpot(data.registration_id).catch((e) =>
+      console.error("[gala/register] hubspot sync threw", data.reference, e)
+    );
   }
 
   return NextResponse.json({ ok: true, data: { ...data, ticket_token: ticketToken } });
