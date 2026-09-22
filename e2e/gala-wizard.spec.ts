@@ -95,7 +95,25 @@ test("6. the sponsor door lists the real tiers and requires a choice", async ({ 
 test("7. a guest can register end to end and gets a reference", async ({ page }) => {
   await page.locator('#gala-content [data-act="pickGuest"]').first().click();
 
-  await page.locator('input[name="code"]').fill("COLLECTIVE-MIKE");
+  // Mint a throwaway host so this test owns the code it spends. Using a
+  // real host's code emptied Mike Fromhold's table twice in one day.
+  const hostStamp = Date.now();
+  const made = await page.request.post("/api/gala/register", {
+    headers: { "x-pw-test": "1" },
+    data: {
+      door: "host",
+      first_name: "Fixture",
+      last_name: `Host${hostStamp}`,
+      email: `pwfixture+${hostStamp}@everestcollective.com`,
+      mobile: "214-555-0133",
+      line: "Holding a table so the guest door has a code to spend",
+      table_name: `Fixture Table ${hostStamp}`,
+    },
+  });
+  const ownCode = (await made.json())?.data?.host_code;
+  expect(ownCode, "fixture host should return a code").toBeTruthy();
+
+  await page.locator('input[name="code"]').fill(ownCode);
   await page.getByRole("button", { name: "Continue" }).click();
 
   await expect(modal(page)).toContainText("Step 2 of 4");
@@ -116,7 +134,7 @@ test("7. a guest can register end to end and gets a reference", async ({ page })
   // state rather than from anything the server sent.
   await expect(modal(page)).toContainText("Step 4 of 4");
   await expect(modal(page)).toContainText("Playwright Guest");
-  await expect(modal(page)).toContainText("Mike Fromhold");
+  await expect(modal(page)).toContainText(`Fixture Host${hostStamp}`);
 
   await page.getByRole("button", { name: "Complete registration" }).click();
 
