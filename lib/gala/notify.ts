@@ -69,10 +69,30 @@ export async function notifyInternal(kind: Kind, registrationId: string) {
   ];
   if (r.table_listed_as) rows.push(["Table listed as", r.table_listed_as]);
   if (r.sponsor_name) rows.push(["Company", r.sponsor_name + (r.sponsor_tier ? ", " + r.sponsor_tier : "")]);
+  if (r.mobile) rows.push(["Phone", r.mobile]);
+
+  // Reign follows up with every sponsor herself (Mike, Sept 23), so the
+  // alert carries everything they typed rather than just the headline.
+  if (kind === "sponsor_committed") {
+    const { data: reg } = await supabase
+      .from("gala_registrations").select("sponsor_id").eq("id", registrationId).single();
+    if (reg?.sponsor_id) {
+      const { data: sp } = await supabase
+        .from("gala_sponsors").select("*").eq("id", reg.sponsor_id).single();
+      const f = (sp ?? {}) as Record<string, unknown>;
+      const str = (v: unknown) => (typeof v === "string" && v.trim() !== "" ? v.trim() : "");
+      if (str(f.legal_name)) rows.push(["Legal name", str(f.legal_name)]);
+      if (str(f.recognition_name)) rows.push(["Recognize as", str(f.recognition_name)]);
+      const web = str(f.website) || str(f.website_url) || str(f.url);
+      if (web) rows.push(["Website", web]);
+    }
+  }
   if (r.arrived_on_code) rows.push(["Their code", r.arrived_on_code]);
   rows.push(["Amount", r.amount_cents > 0 ? money(r.amount_cents) : "Nothing due"]);
   rows.push(["Seats committed", String(r.seats_committed)]);
   rows.push(["Their line", r.line]);
+  if (r.seat_near) rows.push(["Wants to sit near", r.seat_near]);
+  if (r.dietary) rows.push(["Dietary", r.dietary]);
   rows.push(["Reference", r.reference]);
 
   const rowHtml = rows.map(([k, v]) =>
