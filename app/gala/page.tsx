@@ -27,7 +27,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "The Inaugural Collective Gala",
   description:
-    "An evening for faith, family, life, and the North Texas community, benefiting Pregnancy Help 4 U.",
+    "An evening to celebrate life, enjoy great company, and make a meaningful impact, benefiting Pregnancy Help 4 U.",
 };
 
 const money = (cents: number) => "$" + Math.round(cents / 100).toLocaleString("en-US");
