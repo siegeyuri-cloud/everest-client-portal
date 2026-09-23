@@ -147,3 +147,58 @@ export async function notifyInternal(kind: Kind, registrationId: string) {
     return { ok: false, reason: String(err?.message ?? err) };
   }
 }
+
+/**
+ * The sponsor's own confirmation. Sponsors are saved as pending, and the
+ * guest confirmation only goes to comped seats, so until now a sponsor
+ * who finished the form heard nothing at all.
+ */
+export async function sendSponsorThanks(registrationId: string) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) {
+    console.warn("[gala/notify] RESEND_API_KEY missing, sponsor thanks not sent");
+    return { ok: false, reason: "NO_API_KEY" };
+  }
+
+  const supabase = createServiceClient();
+  const { data: r } = await supabase
+    .from("gala_roster").select("*").eq("id", registrationId).single();
+  if (!r || !r.email) return { ok: false, reason: "NO_SUCH_REGISTRATION" };
+
+  const first = esc(r.first_name || "there");
+  const tier = r.sponsor_tier ? esc(r.sponsor_tier) : "a sponsorship";
+  const company = r.sponsor_name ? " for " + esc(r.sponsor_name) : "";
+
+  const html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
+    + '<body style="margin:0;padding:0;background:#f8f5ef;">'
+    + '<div style="max-width:560px;margin:0 auto;padding:40px 28px;font-family:Helvetica,Arial,sans-serif;color:#0f172a;">'
+    + '<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:' + GOLD + ';">The Collective Gala</div>'
+    + '<h1 style="margin:14px 0 0;font-family:Georgia,serif;font-weight:400;font-size:30px;line-height:1.2;">Thank you, ' + first + '</h1>'
+    + '<p style="margin:22px 0 0;font-size:15px;line-height:1.7;color:#334155;">We have your interest in ' + tier + company
+    + ' for The Collective Gala on Thursday, December 3, at The Reserve at Marty B\'s in Bartonville.</p>'
+    + '<p style="margin:16px 0 0;font-size:15px;line-height:1.7;color:#334155;">Reign Bach looks after every sponsor personally and will reach out to you directly to talk through recognition and payment.</p>'
+    + '<p style="margin:16px 0 0;font-size:15px;line-height:1.7;color:#334155;">Questions before then? Write to Reign at '
+    + '<a href="mailto:reign.bach@everestcollective.com" style="color:#7A5C24;">reign.bach@everestcollective.com</a>.</p>'
+    + '<p style="margin:28px 0 0;font-size:13px;color:#64748b;">All proceeds are being donated to Pregnancy Help 4 U. Your reference is ' + esc(r.reference) + '.</p>'
+    + '</div></body></html>';
+
+  const text = "Thank you, " + (r.first_name || "there") + ".\n\n"
+    + "We have your interest in " + (r.sponsor_tier || "a sponsorship")
+    + (r.sponsor_name ? " for " + r.sponsor_name : "")
+    + " for The Collective Gala on Thursday, December 3, at The Reserve at Marty B's in Bartonville.\n\n"
+    + "Reign Bach looks after every sponsor personally and will reach out to you directly to talk through recognition and payment.\n\n"
+    + "Questions before then? Write to Reign at reign.bach@everestcollective.com.\n\n"
+    + "All proceeds are being donated to Pregnancy Help 4 U. Your reference is " + r.reference + ".";
+
+  const { error } = await new Resend(key).emails.send({
+    from: FROM,
+    to: [r.email],
+    subject: "Thank you for your interest in sponsoring The Collective Gala",
+    html, text,
+  });
+  if (error) {
+    console.error("[gala/notify] sponsor thanks failed", r.reference, error);
+    return { ok: false, reason: "SEND_FAILED" };
+  }
+  return { ok: true };
+}

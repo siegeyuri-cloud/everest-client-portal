@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { createServiceClient } from "@/lib/supabaseService";
 import { sendGalaConfirmation } from "@/lib/gala/email";
-import { notifyInternal } from "@/lib/gala/notify";
+import { notifyInternal, sendSponsorThanks } from "@/lib/gala/notify";
 import { syncToHubSpot } from "@/lib/gala/hubspot";
 import { buildCheckoutUrl } from "@/lib/tickettailor";
 
@@ -230,10 +230,18 @@ export async function POST(req: Request) {
 
   // Tables and sponsorships interrupt people. Guests confirming do not.
   if (!isTest && data?.registration_id && (door === "host" || door === "sponsor")) {
-    notifyInternal(
-      door === "host" ? "table_claimed" : "sponsor_committed",
-      data.registration_id
-    ).catch((e) => console.error("[gala/register] notify threw", e));
+    const regId = data.registration_id;
+    // This used to fire without waiting, and Vercel can freeze the
+    // function as soon as the response is sent, so the alert was
+    // silently dropped. after() keeps the function alive until it is done.
+    after(async () => {
+      await notifyInternal(door === "host" ? "table_claimed" : "sponsor_committed", regId)
+        .catch((e) => console.error("[gala/register] notify threw", e));
+      if (door === "sponsor") {
+        await sendSponsorThanks(regId)
+          .catch((e) => console.error("[gala/register] sponsor thanks threw", e));
+      }
+    });
   }
 
   if (!isTest && data?.registration_id) {
