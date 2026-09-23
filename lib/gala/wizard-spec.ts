@@ -88,6 +88,7 @@ export const FIELD_TO_API: Record<string, string> = {
   dietary: "dietary",
   access: "accessibility",
   seatNear: "seat_near",
+  host: "seat_near",
   line: "line",
   code: "code",
   tableName: "table_name",
