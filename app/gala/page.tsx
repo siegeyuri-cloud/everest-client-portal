@@ -205,7 +205,12 @@ export default async function GalaPage() {
     <>
       <div id="gala-content" dangerouslySetInnerHTML={{ __html: pageHtml }} />
       <GalaAccordion />
-      <GalaWizard template={modalTpl} tiers={tierRows} hosts={hostNames} />
+      <GalaWizard
+        template={modalTpl}
+        tiers={tierRows}
+        hosts={hostNames}
+        calendarUrl={s?.calendar_url ?? ""}
+      />
     </>
   );
 }

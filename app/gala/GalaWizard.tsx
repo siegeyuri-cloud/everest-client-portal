@@ -66,14 +66,30 @@ export type WizardTier = {
   takenList: string;
 };
 
+// Mike, Sept 23: seats and tables buy on Ticket Tailor, which asks for
+// every name and meal itself. Invited guests use Reign's RSVP form.
+// Only sponsors stay here: a few questions, then Reign is notified.
+const BOX_OFFICE_URL = "https://www.tickettailor.com/events/everestcollectivellc/2426641";
+const RSVP_FORM_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=FIxrIXQCVUK7h8XvyDxRcpkJvQeunFhHg2VUCervPxpUOUtES00zRElIVUlUU1ZISlpZUk1ORVA5Uy4u";
+const HANDOFF: Partial<Record<Door, string>> = {
+  seat: BOX_OFFICE_URL,
+  host: BOX_OFFICE_URL,
+  guest: RSVP_FORM_URL,
+};
+const ACT_TO_DOOR: Record<string, Door> = {
+  pickSeat: "seat", pickHost: "host", pickGuest: "guest", pickSponsor: "sponsor",
+};
+
 export default function GalaWizard({
   template,
   tiers,
   hosts,
+  calendarUrl,
 }: {
   template: string;
   tiers: WizardTier[];
   hosts: string[];
+  calendarUrl: string;
 }) {
   const tpl = useMemo(() => prepare(template), [template]);
   const hostRef = useRef<HTMLDivElement>(null);
@@ -197,7 +213,27 @@ export default function GalaWizard({
   }, []);
 
   const pick = useCallback((d: Door) => {
+    const away = HANDOFF[d];
+    if (away) { window.location.assign(away); return; }
     setDoor(d); setStep(0); setErr({});
+  }, []);
+
+  // The door buttons have their own click wiring further down. Catching
+  // the click on the way in, before any of it runs, means the doors that
+  // leave the site do so without the modal flashing open behind them.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-act]");
+      if (!el) return;
+      const d = ACT_TO_DOOR[el.getAttribute("data-act") ?? ""];
+      const away = d ? HANDOFF[d] : undefined;
+      if (!away) return;
+      e.preventDefault();
+      e.stopPropagation();
+      window.location.assign(away);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
   }, []);
 
   const back = useCallback(() => {
@@ -394,6 +430,7 @@ export default function GalaWizard({
       showNav: !done && door !== null,
       nextLabel: sending
         ? "Registering..."
+        : door === "sponsor" && key === "review" ? "Send to Reign"
         : key === "review" ? "Complete registration"
         : key === "pay" ? "Done for now"
         : "Continue",
@@ -493,12 +530,27 @@ export default function GalaWizard({
 
       errSubmit: err.submit ?? "",
       hostOptions: hosts,
-      doneEmail: form.email ?? "", doneGuest: "", doneLine: ref,
-      calendarUrl: "#",
+      doneEmail: form.email ?? "",
+      doneGuest: [form.gFirst, form.gLast].filter(Boolean).join(" "),
+      doneLine: form.line ?? "",
+      ref,
+
+      // Nothing is owed on a comped seat, so that is the only case where
+      // finishing the wizard means they are actually in. Everyone else
+      // still has to pay, and saying "You are in" to them is a lie.
+      doneHeading: door === "guest" ? "You are in"
+        : door === "sponsor" ? "Thank you" : "Your place is held",
+      // Sponsors pay Reign directly, so there is nothing owed on screen.
+      showOwing: door !== "guest" && door !== "sponsor" && amountCents > 0,
+      sponsorDone: door === "sponsor",
+      owingNote: "Nothing is confirmed until payment clears. Your reference is "
+        + ref + ".",
+      calendarUrl: calendarUrl || "#",
+      showCalendar: calendarUrl !== "",
     };
   }, [open, door, step, key, steps.length, form, err, seats, hasGuest,
       rosterByEmail, codeInfo, done, tiers, tierId, sending, ref, amountCents, comped,
-      hostCode, hosts, checkoutUrl]);
+      hostCode, hosts, checkoutUrl, calendarUrl]);
 
   const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
 

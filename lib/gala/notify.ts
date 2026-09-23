@@ -60,7 +60,7 @@ export async function notifyInternal(kind: Kind, registrationId: string) {
   const { data: cap } = await supabase.from("gala_capacity").select("*").single();
   const { data: sum } = await supabase.from("gala_summary").select("raised_cents").single();
 
-  const base = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/+$/, "");
+  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/+$/, "");
   const headline = HEADLINE[kind];
 
   const rows: Array<[string, string]> = [

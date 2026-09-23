@@ -30,7 +30,7 @@ export const DOORS: Record<string, { label: string; steps: string[] }> = {
   host: { label: "Table host", steps: ["table", "you", "connect", "roster", "review", "pay"] },
   sponsor: {
     label: "Corporate sponsor",
-    steps: ["tier", "company", "you", "connect", "roster", "review", "pay"],
+    steps: ["tier", "company", "you", "connect", "review"],
   },
 };
 

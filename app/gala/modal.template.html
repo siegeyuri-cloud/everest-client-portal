@@ -81,7 +81,7 @@
                   <span style="font-size:14px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.8);">Table of ten</span>
                   <span style="font-family:'Marcellus',Georgia,serif;font-size:28px;color:var(--fl-gold);">$2,500</span>
                 </div>
-                <div style="font-size:12px;font-weight:300;line-height:1.6;letter-spacing:0.04em;color:rgba(244,238,226,0.66);">Ten seats at $250. The proceeds are donated to Pregnancy Help 4 U.</div>
+                <div style="font-size:12px;font-weight:300;line-height:1.6;letter-spacing:0.04em;color:rgba(244,238,226,0.66);">Ten seats at $250. All proceeds are being donated to Pregnancy Help 4 U.</div>
               </div>
               <div style="display:flex;flex-direction:column;gap:10px;">
                 <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Name the table will be listed under</span>
@@ -93,7 +93,7 @@
           <sc-if value="{{ showTier }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:22px;">
               <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.15;color:var(--fl-ivory);">Choose a tier</h3>
-              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.55;color:rgba(244,238,226,0.68);">Amounts are placeholders until the committee signs off. If you are looking at the top two, call instead and we will build it around you.</p>
+              <p style="margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.55;color:rgba(244,238,226,0.68);">Choose the tier you are interested in and answer a few short questions. Reign Bach looks after every sponsor personally and will reach out to you directly.</p>
               <div style="display:flex;flex-direction:column;gap:12px;">
                 <sc-for list="{{ tierChoices }}" as="t" hint-placeholder-count="4">
                   <button sc-camel-on-click="{{ t.pick }}" style="text-align:left;background:{{ t.bg }};border:1px solid {{ t.border }};padding:22px 24px;cursor:{{ t.cursor }};display:flex;flex-direction:column;gap:12px;transition:all 200ms cubic-bezier(0.16,1,0.3,1);">
@@ -319,7 +319,7 @@
                 <div style="border:1px solid rgba(192,149,81,0.45);background:rgba(192,149,81,0.05);padding:30px 26px;display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center;">
                   <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.55;color:rgba(244,238,226,0.72);max-width:430px;">On the next page choose <strong style="color:var(--fl-gold);font-weight:400;">{{ bundleName }}</strong>. Your reference {{ ref }} travels with you, so we can match the payment to this registration.</span>
                   <a href="{{ checkoutUrl }}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:var(--fl-gold);color:#0B1521;font-size:12px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;padding:17px 34px;min-height:44px;text-decoration:none;">Pay {{ payAmount }}</a>
-                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.55);max-width:430px;">Checkout runs in Everest Collective's name, because this is an Everest Collective event. Everything collected is donated to Pregnancy Help 4 U.</span>
+                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.55);max-width:430px;">Checkout runs in Everest Collective's name, because this is an Everest Collective event. All proceeds are being donated to Pregnancy Help 4 U.</span>
                 </div>
               </sc-if>
               <sc-if value="{{ showNoCheckout }}" hint-placeholder-val="{{ false }}">
@@ -336,8 +336,16 @@
               <div style="line-height:0;">
                 <svg width="220" height="30" sc-camel-view-box="0 0 220 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 27 Q110 -6 218 27" stroke="var(--fl-gold)" stroke-width="1.3" fill="none" stroke-linecap="round"></path></svg>
               </div>
-              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:44px;line-height:1.1;letter-spacing:0.03em;color:var(--fl-ivory);">You are in</h3>
-              <p style="margin:0;max-width:440px;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.6;color:rgba(244,238,226,0.72);">A confirmation is on its way to {{ doneEmail }}. Your badge will read {{ doneLine }}, so expect a stranger to walk up and ask about it.</p>
+              <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:44px;line-height:1.1;letter-spacing:0.03em;color:var(--fl-ivory);">{{ doneHeading }}</h3>
+              <p style="margin:0;max-width:440px;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.6;color:rgba(244,238,226,0.72);">A confirmation is on its way to {{ doneEmail }}. Your badge will read: {{ doneLine }}</p>
+              <sc-if value="{{ showOwing }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px solid rgba(224,162,94,0.45);background:rgba(224,162,94,0.07);padding:20px 24px;max-width:440px;">
+                  <p style="margin:0;font-size:13.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.78);">{{ owingNote }}</p>
+                </div>
+              </sc-if>
+              <sc-if value="{{ sponsorDone }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;max-width:440px;font-size:13.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.7);">Reign Bach will reach out personally to talk through recognition and payment. Questions before then: reign.bach@everestcollective.com</p>
+              </sc-if>
               <sc-if value="{{ isComp }}" hint-placeholder-val="{{ false }}">
                 <p style="margin:0;max-width:440px;font-size:13.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.62);">Your seat is complimentary and there is nothing to pay. We are placing you ourselves rather than at a host table, so your table number arrives with your ticket.</p>
               </sc-if>
@@ -352,7 +360,9 @@
                 </div>
               </sc-if>
               <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;width:100%;max-width:340px;">
-                <a href="{{ calendarUrl }}" style="background:var(--fl-gold);color:#0B1521;font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:18px;text-align:center;">Add to calendar</a>
+                <sc-if value="{{ showCalendar }}" hint-placeholder-val="{{ true }}">
+                <a href="{{ calendarUrl }}" target="_blank" rel="noopener noreferrer" style="background:var(--fl-gold);color:#0B1521;font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;padding:18px;text-align:center;">Add to calendar</a>
+                </sc-if>
                 <button sc-camel-on-click="{{ close }}" style="background:none;border:1px solid rgba(192,149,81,0.4);color:rgba(244,238,226,0.75);font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;padding:17px;cursor:pointer;">Back to the page</button>
               </div>
             </div>
