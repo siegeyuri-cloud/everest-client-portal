@@ -30,7 +30,7 @@ export const DOORS: Record<string, { label: string; steps: string[] }> = {
   host: { label: "Table host", steps: ["table", "you", "connect", "roster", "review", "pay"] },
   sponsor: {
     label: "Corporate sponsor",
-    steps: ["tier", "company", "you", "connect", "review"],
+    steps: ["tier", "company", "you", "review"],
   },
 };
 
@@ -42,33 +42,11 @@ export const YOU_HALF: Field[] = [
   { name: "last", label: "Last name", ph: "Chen", req: true },
   { name: "mobile", label: "Mobile", ph: "(214) 555 0134", req: true },
   { name: "email", label: "Email", ph: "you@company.com", req: true },
-  { name: "company", label: "Company", ph: "Optional", req: false },
-  { name: "title", label: "Title", ph: "Optional", req: false },
 ];
 
-export const YOU_FULL: Field[] = [
-  {
-    name: "badge",
-    label: "Preferred name for your badge",
-    ph: "Dave",
-    req: false,
-    hint: "So the badge does not say Robert on a man everyone calls Bob.",
-  },
-  { name: "dietary", label: "Dietary needs", ph: "Optional", req: false },
-  {
-    name: "access",
-    label: "Accessibility needs",
-    ph: "Optional",
-    req: false,
-    hint: "Step free access, a seat near the front, anything that makes the night easier.",
-  },
-  {
-    name: "invitedBy",
-    label: "Who invited you?",
-    ph: "A name, or how you heard about the evening",
-    req: false,
-  },
-];
+// Sponsors are the only door left in this form (Mike, Sept 23), and
+// Reign gathers badge, dietary and access details when she follows up.
+export const YOU_FULL: Field[] = [];
 
 /**
  * The plus-one. Their own mobile and their own email, deliberately,

@@ -338,6 +338,11 @@ export default function GalaWizard({
     // Review is where the registration is actually created, on every
     // door. A door that pays then shows the amount the server worked
     // out, so the price on screen is never a second guess at it.
+    // The server still requires a line on every registration. Sponsors
+    // are no longer asked for one, so theirs is filled in here.
+    if (key === "review" && door === "sponsor" && !(merged.line ?? "").trim()) {
+      merged.line = "Sponsor, details to follow with Reign";
+    }
     if (key === "review") {
       const ok = await submit(merged);
       if (!ok) return;
@@ -352,7 +357,7 @@ export default function GalaWizard({
     if (step + 1 >= steps.length) { setDone(true); } else { setStep((s) => s + 1); }
     // tierId and submit both belong here. Without tierId, next() closes
     // over the value from when it was created, which is null.
-  }, [form, harvest, key, step, steps, submit, tierId, hasGuest]);
+  }, [form, harvest, key, step, steps, submit, tierId, hasGuest, door]);
 
 
   const actions = useMemo<Record<string, () => void>>(() => ({

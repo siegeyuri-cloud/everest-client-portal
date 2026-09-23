@@ -36,7 +36,7 @@
                 </button>
                 <button sc-camel-on-click="{{ pickSponsor }}" style="text-align:left;background:rgba(244,238,226,0.04);border:1px solid rgba(192,149,81,0.25);padding:22px 24px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 220ms cubic-bezier(0.16,1,0.3,1);" style-hover="background:rgba(244,238,226,0.08);border-color:rgba(192,149,81,0.55);">
                   <span style="font-family:'Marcellus',Georgia,serif;font-size:21px;color:var(--fl-ivory);">We want to sponsor</span>
-                  <span style="font-size:12.5px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.55);">Tiers, logo placement, seats.</span>
+                  <span style="font-size:12.5px;font-weight:300;letter-spacing:0.06em;color:rgba(244,238,226,0.55);">Tiers and seats.</span>
                 </button>
               </div>
             </div>
@@ -104,9 +104,6 @@
                     <span style="font-size:12.5px;font-weight:300;letter-spacing:0.05em;line-height:1.55;color:rgba(244,238,226,0.62);">{{ t.seats }} &nbsp;·&nbsp; {{ t.recognition }}</span>
                     <span style="width:100%;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(192,149,81,0.18);padding-top:11px;">
                       <span style="font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:{{ t.availColor }};">{{ t.availability }}</span>
-                      <sc-if value="{{ t.takenList }}" hint-placeholder-val="{{ false }}">
-                        <span style="min-width:0;font-size:11.5px;font-weight:300;letter-spacing:0.04em;color:rgba(244,238,226,0.66);">Taken by {{ t.takenList }}</span>
-                      </sc-if>
                     </span>
                   </button>
                 </sc-for>
@@ -133,13 +130,6 @@
                     </sc-if>
                   </label>
                 </sc-for>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:12px;">
-                <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.62);">Your logo</span>
-                <div style="width:100%;height:200px;border:1px dashed rgba(192,149,81,0.45);padding:14px;">
-                  <image-slot id="sponsor-logo-upload" shape="rect" fit="contain" placeholder="Drop a logo, PNG or SVG with a transparent background"></image-slot>
-                </div>
-                <span style="font-size:12px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.66);">Vector or a PNG at least 1200px wide. We will come back to you if it will not hold up on the screen at the front of the room.</span>
               </div>
               <sc-if value="{{ errCompany }}" hint-placeholder-val="{{ false }}">
                 <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errCompany }}</div>
