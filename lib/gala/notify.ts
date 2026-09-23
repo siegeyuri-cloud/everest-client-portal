@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { createServiceClient } from "@/lib/supabaseService";
+import { renderGalaEmail } from "@/lib/gala/email-shell";
 
 /**
  * Internal alerts to the Everest team.
@@ -107,7 +108,7 @@ export async function notifyInternal(kind: Kind, registrationId: string) {
       + cap.seats_pending + ' in checkout, ' + cap.seats_remaining + ' open.</p>'
     : "";
 
-  const html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
+  let html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
     + '<body style="margin:0;padding:24px 16px;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;">'
     + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">'
     + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#fff;border:1px solid #e2e8f0;border-top:3px solid ' + GOLD + ';">'
@@ -130,6 +131,10 @@ export async function notifyInternal(kind: Kind, registrationId: string) {
   ].filter(Boolean).join("\n");
 
   try {
+    // Same look as the site. The seat and raised line is left out on
+    // purpose: Ticket Tailor sales do not reach this database, so those
+    // numbers would always be wrong.
+    html = renderGalaEmail({ eyebrow: "The Collective Gala · Team alert", heading: headline, rows });
     const { error } = await new Resend(key).emails.send({
       from: FROM,
       to,
@@ -169,18 +174,17 @@ export async function sendSponsorThanks(registrationId: string) {
   const tier = r.sponsor_tier ? esc(r.sponsor_tier) : "a sponsorship";
   const company = r.sponsor_name ? " for " + esc(r.sponsor_name) : "";
 
-  const html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head>'
-    + '<body style="margin:0;padding:0;background:#f8f5ef;">'
-    + '<div style="max-width:560px;margin:0 auto;padding:40px 28px;font-family:Helvetica,Arial,sans-serif;color:#0f172a;">'
-    + '<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:' + GOLD + ';">The Collective Gala</div>'
-    + '<h1 style="margin:14px 0 0;font-family:Georgia,serif;font-weight:400;font-size:30px;line-height:1.2;">Thank you, ' + first + '</h1>'
-    + '<p style="margin:22px 0 0;font-size:15px;line-height:1.7;color:#334155;">We have your interest in ' + tier + company
-    + ' for The Collective Gala on Thursday, December 3, at The Reserve at Marty B\'s in Bartonville.</p>'
-    + '<p style="margin:16px 0 0;font-size:15px;line-height:1.7;color:#334155;">Reign Bach looks after every sponsor personally and will reach out to you directly to talk through recognition and payment.</p>'
-    + '<p style="margin:16px 0 0;font-size:15px;line-height:1.7;color:#334155;">Questions before then? Write to Reign at '
-    + '<a href="mailto:reign.bach@everestcollective.com" style="color:#7A5C24;">reign.bach@everestcollective.com</a>.</p>'
-    + '<p style="margin:28px 0 0;font-size:13px;color:#64748b;">All proceeds are being donated to Pregnancy Help 4 U. Your reference is ' + esc(r.reference) + '.</p>'
-    + '</div></body></html>';
+  const html = renderGalaEmail({
+    eyebrow: "The Collective Gala",
+    heading: "Thank you, " + (r.first_name || "there"),
+    paragraphs: [
+      "We have your interest in <strong style=\"color:#C09551;font-weight:500;\">" + tier + "</strong>" + company
+        + " for The Collective Gala on Thursday, December 3, at The Reserve at Marty B&#39;s in Bartonville.",
+      "Reign Bach looks after every sponsor personally and will reach out to you directly to talk through recognition and payment.",
+      "Questions before then? Write to Reign at <a href=\"mailto:reign.bach@everestcollective.com\" style=\"color:#C09551;\">reign.bach@everestcollective.com</a>.",
+    ],
+    note: "All proceeds are being donated to Pregnancy Help 4 U. Your reference is " + esc(r.reference) + ".",
+  });
 
   const text = "Thank you, " + (r.first_name || "there") + ".\n\n"
     + "We have your interest in " + (r.sponsor_tier || "a sponsorship")
