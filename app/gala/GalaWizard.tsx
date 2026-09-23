@@ -557,7 +557,18 @@ export default function GalaWizard({
       rosterByEmail, codeInfo, done, tiers, tierId, sending, ref, amountCents, comped,
       hostCode, hosts, checkoutUrl, calendarUrl]);
 
-  const html = useMemo(() => (open ? render(tpl, scope) : ""), [open, tpl, scope]);
+  // Sponsors are the only door left in this form. The review summary
+  // still carried attendee rows (table host, badge, the auto-filled
+  // line), which mean nothing to a sponsor, so they are dropped here.
+  const html = useMemo(() => {
+    if (!open) return "";
+    if (door !== "sponsor") return render(tpl, scope);
+    const rows = ((scope as Record<string, unknown>).summary ?? []) as Array<{ k?: unknown }>;
+    const keep = rows.filter(
+      (r) => !/host|line|badge|dietar|access|invit|seat|near|guest|talk|meet/i.test(String(r.k ?? "")),
+    );
+    return render(tpl, { ...scope, summary: keep });
+  }, [open, tpl, scope, door]);
 
   useEffect(() => {
     const root = hostRef.current;

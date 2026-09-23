@@ -102,9 +102,6 @@
                       <span style="flex:none;font-size:17px;font-weight:400;letter-spacing:0.06em;color:var(--fl-gold);">{{ t.amount }}</span>
                     </span>
                     <span style="font-size:12.5px;font-weight:300;letter-spacing:0.05em;line-height:1.55;color:rgba(244,238,226,0.62);">{{ t.seats }} &nbsp;·&nbsp; {{ t.recognition }}</span>
-                    <span style="width:100%;display:flex;align-items:center;gap:10px;border-top:1px solid rgba(192,149,81,0.18);padding-top:11px;">
-                      <span style="font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:{{ t.availColor }};">{{ t.availability }}</span>
-                    </span>
                   </button>
                 </sc-for>
               </div>
@@ -202,10 +199,6 @@
                     </sc-if>
                   </label>
                 </sc-for>
-                <label style="grid-column:1/-1;display:flex;flex-direction:column;gap:9px;">
-                  <span style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Table host, if you know</span>
-                  <input name="host" type="text" placeholder="A name, if you know it" autocomplete="off" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.3);color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;min-height:44px;">
-                </label>
               </div>
               <sc-if value="{{ errYou }}" hint-placeholder-val="{{ false }}">
                 <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errYou }}</div>
@@ -252,33 +245,6 @@
             </div>
           </sc-if>
 
-          <sc-if value="{{ showConnect }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;flex-direction:column;gap:24px;">
-              <div style="display:flex;flex-direction:column;gap:14px;">
-                <div style="font-size:10px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:var(--fl-gold);">One question, and it matters</div>
-                <h3 style="margin:0;font-family:'Marcellus',Georgia,serif;font-weight:400;font-size:34px;line-height:1.2;color:var(--fl-ivory);">What could you talk about for an hour without any notes?</h3>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:10px;">
-                <input type="text" name="line" value="{{ vLine }}" sc-camel-on-change="{{ onField }}" maxlength="60" placeholder="Restoring a 1968 Bronco" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid {{ lineBorder }};color:var(--fl-ivory);font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;padding:19px 21px;outline:none;">
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;">
-                  <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.66);">Be specific. This will appear on your name badge and your table card, and someone is going to walk up and ask you about it.</span>
-                  <span style="flex:none;font-size:12px;letter-spacing:0.1em;color:{{ countColor }};">{{ lineCount }}</span>
-                </div>
-              </div>
-              <sc-if value="{{ errLine }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:13px;letter-spacing:0.04em;color:#E0A25E;">{{ errLine }}</div>
-              </sc-if>
-
-              <div style="margin-top:14px;padding-top:28px;border-top:1px solid rgba(192,149,81,0.22);display:flex;flex-direction:column;gap:12px;">
-                <div style="font-size:10.5px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:rgba(244,238,226,0.66);">Optional, and never printed</div>
-                <label style="display:flex;flex-direction:column;gap:12px;">
-                  <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;line-height:1.5;color:rgba(244,238,226,0.82);">Is there anyone you would like to meet at this event, or a kind of person you would like to be seated near?</span>
-                  <input type="text" name="seatNear" value="{{ vSeatNear }}" sc-camel-on-change="{{ onField }}" placeholder="Someone in commercial real estate, or the Whitmores" style="width:100%;background:rgba(244,238,226,0.05);border:1px solid rgba(192,149,81,0.28);color:var(--fl-ivory);font-size:16px;padding:15px 17px;outline:none;">
-                </label>
-                <span style="font-size:12.5px;font-weight:300;line-height:1.6;color:rgba(244,238,226,0.66);">This one is for the seating chart. Nobody sees it but us.</span>
-              </div>
-            </div>
-          </sc-if>
 
           <sc-if value="{{ showReview }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:24px;">
@@ -337,13 +303,6 @@
               </sc-if>
               <sc-if value="{{ hasGuest }}" hint-placeholder-val="{{ false }}">
                 <p style="margin:0;max-width:440px;font-size:13.5px;font-weight:300;line-height:1.7;color:rgba(244,238,226,0.6);">We are texting {{ doneGuest }} one question. It takes thirty seconds and it is the difference between a badge that starts a conversation and one that wastes the ink.</p>
-              </sc-if>
-              <sc-if value="{{ showHostCode }}" hint-placeholder-val="{{ false }}">
-                <div data-host-code style="display:flex;flex-direction:column;gap:10px;align-items:center;border:1px dashed rgba(192,149,81,0.45);background:rgba(192,149,81,0.05);padding:24px 26px;max-width:440px;">
-                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.26em;text-transform:uppercase;color:var(--fl-gold);">{{ hostCodeLabel }}</span>
-                  <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:22px;letter-spacing:0.06em;color:var(--fl-ivory);word-break:break-all;">{{ hostCode }}</span>
-                  <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.55;color:rgba(244,238,226,0.66);">{{ hostCodeNote }}</span>
-                </div>
               </sc-if>
               <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;width:100%;max-width:340px;">
                 <sc-if value="{{ showCalendar }}" hint-placeholder-val="{{ true }}">
