@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { createServiceClient } from "@/lib/supabaseService";
 import { render, prepare } from "@/lib/gala/template";
 import GalaAccordion from "./GalaAccordion";
+import GalaOnePager from "./GalaOnePager";
 import GalaWizard from "./GalaWizard";
 import "./gala.css";
 
@@ -205,6 +206,7 @@ export default async function GalaPage() {
     <>
       <div id="gala-content" dangerouslySetInnerHTML={{ __html: pageHtml }} />
       <GalaAccordion />
+      <GalaOnePager />
       <GalaWizard
         template={modalTpl}
         tiers={tierRows}

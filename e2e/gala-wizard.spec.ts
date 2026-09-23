@@ -105,3 +105,18 @@ test("17. the sponsor door shows tiers and requires a choice", async ({ page }) 
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(panel).toContainText("Choose a tier to continue.");
 });
+
+test("18. the one-pager asks for an email, then downloads", async ({ page }) => {
+  // Answer the API here so the test never writes a contact to HubSpot.
+  await page.route("**/api/gala/onepager", (r) =>
+    r.fulfill({ status: 200, contentType: "application/json",
+      body: JSON.stringify({ ok: true, url: "/gala/sponsorship-one-pager.pdf" }) }));
+  await page.locator("#gala-content [data-onepager]").first().click();
+  const modal = page.locator("[data-onepager-modal]");
+  await expect(modal).toContainText("The sponsorship one-pager");
+  await modal.locator('input[name="opEmail"]').fill("pwonepager@example.com");
+  const download = page.waitForEvent("download");
+  await modal.getByRole("button", { name: "Download the one-pager" }).click();
+  await download;
+  await expect(modal).toContainText("Your download has started");
+});
