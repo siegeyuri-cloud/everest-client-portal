@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 // Gala registration is public by design: invited guests, ticket buyers and
 // sponsors complete a registration without ever having a portal account.
 // Everything else still requires a session.
-const PUBLIC_PATHS = ["/login", "/auth", "/api/gala", "/gala"];
+const PUBLIC_PATHS = ["/login", "/auth", "/api/gala", "/gala", "/api/discovery"];
 
 export async function proxy(request: NextRequest) {
   // One deployment, two front doors. gala.everestcollective.com serves
