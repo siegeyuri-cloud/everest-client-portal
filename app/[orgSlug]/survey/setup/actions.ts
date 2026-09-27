@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { createHash, randomBytes } from "crypto";
+import { Resend } from "resend";
 import { requireEverestAdmin } from "@/lib/survey/access";
 import { createServiceClient } from "@/lib/supabaseService";
-import type { Result } from "@/lib/survey/data";
+import type { LinkResult, Result } from "@/lib/survey/data";
 
 /**
  * Every action re-checks that the caller is an Everest admin and that the
@@ -23,7 +25,7 @@ async function loadRound(slug: string, roundId: string) {
   const { data } = await s.from("survey_rounds").select("id, status, organization_id").eq("id", roundId).maybeSingle();
   const round =
     data && data.organization_id === access.org.id ? (data as { id: string; status: string; organization_id: string }) : null;
-  return { s, round };
+  return { s, round, access };
 }
 
 export async function createRound(slug: string): Promise<Result> {
@@ -136,4 +138,92 @@ export async function setStatus(slug: string, roundId: string, next: "open" | "c
     return error ? no(error.message) : ok(slug);
   }
   return no("Unknown status.");
+}
+
+const escHtml = (v: string) =>
+  v.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" } as Record<string, string>)[c]);
+
+function inviteHtml(org: string, leader: string, first: string, url: string) {
+  return `<div style="background:#F0EEEC;padding:32px 16px;font-family:Montserrat,Helvetica,Arial,sans-serif;color:#3C4142;">
+<div style="max-width:520px;margin:0 auto;background:#FFFFFF;border-radius:10px;padding:32px;">
+<p style="margin:0 0 8px;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#2B7F85;font-weight:700;">Leader values survey</p>
+<h1 style="margin:0 0 16px;font-size:26px;line-height:1.2;color:#2D3132;">Your feedback for ${escHtml(leader)}</h1>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;">${escHtml(org)} and Everest Collective are asking for your honest feedback on how ${escHtml(first)} lives the company's values. It takes about 3 minutes.</p>
+<p style="margin:24px 0;"><a href="${escHtml(url)}" style="background:#6CCAD0;color:#000000;text-decoration:none;font-weight:700;padding:12px 22px;border-radius:6px;display:inline-block;">Start the survey</a></p>
+<p style="margin:0;font-size:13px;line-height:1.6;color:#636466;">Your answers are anonymous. ${escHtml(first)} sees averages only, and only once at least 3 people have responded. This link is just for you and works once.</p>
+</div></div>`;
+}
+
+/**
+ * One private link per rater. Only a SHA-256 hash of each token is stored,
+ * so the links are returned here once and can never be shown again.
+ */
+export async function createInvites(
+  slug: string,
+  roundId: string,
+  leaderId: string,
+  input: { emails: string; count: number; send: boolean },
+): Promise<LinkResult> {
+  const { s, round, access } = await loadRound(slug, roundId);
+  if (!round) return { ok: false, error: "Survey not found for this client." };
+  if (round.status === "closed") return { ok: false, error: "This survey is closed. Reopen it to create links." };
+
+  const { data: leader } = await s.from("survey_leaders").select("id, name").eq("id", leaderId).eq("round_id", roundId).maybeSingle();
+  if (!leader) return { ok: false, error: "Choose a leader from this survey." };
+
+  const raw = String(input?.emails ?? "").split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean);
+  const bad = raw.filter((e) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+  if (bad.length) return { ok: false, error: `These don't look like email addresses: ${bad.slice(0, 3).join(", ")}` };
+  const emails = [...new Set(raw)];
+  const n = emails.length || Math.floor(Number(input?.count) || 0);
+  if (n < 1 || n > 100) return { ok: false, error: "Create between 1 and 100 links at a time." };
+  const send = !!input?.send && emails.length > 0;
+  if (send && round.status !== "open") return { ok: false, error: "Open the survey before emailing links." };
+
+  const base = (process.env.SURVEY_BASE_URL ?? "https://clients.everestcollective.com").replace(/\/$/, "");
+  const made = Array.from({ length: n }, (_, i) => {
+    const token = randomBytes(24).toString("base64url");
+    return { token, email: emails[i] ?? null, hash: createHash("sha256").update(token).digest("hex") };
+  });
+  const { error } = await s
+    .from("survey_invites")
+    .insert(made.map((m) => ({ round_id: roundId, leader_id: leaderId, token_hash: m.hash, rater_email: m.email })));
+  if (error) return { ok: false, error: error.message };
+  const links = made.map((m) => ({ email: m.email, url: `${base}/${slug}/survey?invite=${m.token}` }));
+
+  let emailed = 0;
+  let note: string | null = null;
+  if (send) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) {
+      note = "Links created, but email is not configured, so none were sent.";
+    } else {
+      const from = process.env.SURVEY_FROM_EMAIL ?? "Everest Collective <survey@everestcollective.com>";
+      const name = String(leader.name);
+      const first = name.split(" ")[0];
+      const batch = made
+        .map((m, i) => ({ m, url: links[i].url }))
+        .filter((x) => x.m.email)
+        .map((x) => ({
+          from,
+          to: x.m.email as string,
+          subject: `Your anonymous feedback for ${name}`,
+          html: inviteHtml(access.org.name, name, first, x.url),
+          text: `${access.org.name} and Everest Collective are asking for your honest feedback on ${name}. It takes about 3 minutes.\n\nStart the survey: ${x.url}\n\nYour answers are anonymous. ${first} sees averages only, and only once at least 3 people have responded. This link is just for you and works once.`,
+        }));
+      const r = await new Resend(key).batch.send(batch);
+      if (r.error) {
+        console.error("[survey] invite batch failed", r.error);
+        note = "Links created, but the emails could not be sent. Copy the links below instead.";
+      } else {
+        emailed = batch.length;
+        await s
+          .from("survey_invites")
+          .update({ sent_at: new Date().toISOString() })
+          .in("token_hash", made.filter((m) => m.email).map((m) => m.hash));
+      }
+    }
+  }
+  revalidatePath(`/${slug}/survey/setup`);
+  return { ok: true, links, emailed, note };
 }

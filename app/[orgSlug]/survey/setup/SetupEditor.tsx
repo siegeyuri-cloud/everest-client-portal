@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { createRound, saveValues, addTeam, removeTeam, addLeader, removeLeader, setStatus } from "./actions";
-import type { Result, SetupData } from "@/lib/survey/data";
+import { createRound, saveValues, addTeam, removeTeam, addLeader, removeLeader, setStatus, createInvites } from "./actions";
+import type { LinkResult, Result, SetupData } from "@/lib/survey/data";
 
 type DraftValue = { name: string; behaviors: string[] };
 const blank = (): DraftValue => ({ name: "", behaviors: ["", ""] });
@@ -30,6 +30,36 @@ export default function SetupEditor({ slug, orgName, data }: { slug: string; org
 
   const [teamName, setTeamName] = React.useState("");
   const [leader, setLeader] = React.useState({ name: "", email: "", teamId: "" });
+  const [inv, setInv] = React.useState({ leaderId: "", count: 5, emails: "", send: false });
+  const [links, setLinks] = React.useState<{ email: string | null; url: string }[] | null>(null);
+  const [copied, setCopied] = React.useState(false);
+  const linkText = (list: { email: string | null; url: string }[]) =>
+    list.map((l) => (l.email ? l.email + "  " : "") + l.url).join("\n");
+  const makeLinks = () =>
+    startTransition(async () => {
+      const rid = data.round?.id;
+      if (!rid) return;
+      const r: LinkResult = await createInvites(slug, rid, inv.leaderId, inv);
+      if (r.ok) {
+        setLinks(r.links);
+        setCopied(false);
+        const made = `Created ${r.links.length} ${r.links.length === 1 ? "link" : "links"}`;
+        setMsg({ ok: !r.note, text: r.note ?? (r.emailed ? `${made} and emailed ${r.emailed}.` : `${made}.`) });
+        setInv({ ...inv, emails: "", send: false });
+        router.refresh();
+      } else {
+        setMsg({ ok: false, text: r.error });
+      }
+    });
+  const copyAll = async () => {
+    if (!links) return;
+    try {
+      await navigator.clipboard.writeText(linkText(links));
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   const run = (fn: () => Promise<Result>, done: string, after?: () => void) =>
     startTransition(async () => {
@@ -224,6 +254,7 @@ export default function SetupEditor({ slug, orgName, data }: { slug: string; org
                         <th>Team</th>
                         <th>Email</th>
                         <th>Ratings</th>
+                        <th>Links</th>
                         <th aria-label="Actions"></th>
                       </tr>
                     </thead>
@@ -238,6 +269,7 @@ export default function SetupEditor({ slug, orgName, data }: { slug: string; org
                               ? `${l.responses} ratings`
                               : `${l.responses} of ${round.anonymity_threshold} needed`}
                           </td>
+                          <td>{l.invites}</td>
                           <td style={{ textAlign: "right" }}>
                             <button
                               className="ecs-btn ecs-btn--quiet"
@@ -280,6 +312,82 @@ export default function SetupEditor({ slug, orgName, data }: { slug: string; org
                   Add leader
                 </button>
               </div>
+            </div>
+            <div className="ecs-card">
+              <h2 className="ecs-h2">Survey links</h2>
+              <p className="ecs-muted">
+                Each rater gets their own private link that works once. Paste their emails to create one link each, or
+                leave the box empty to create a number of links to share yourself.
+              </p>
+              {data.leaders.length === 0 ? (
+                <p className="ecs-muted" style={{ marginTop: 12 }}>Add a leader first.</p>
+              ) : (
+                <>
+                  <div className="ecs-row" style={{ marginTop: 16 }}>
+                    <label className="ecs-field">
+                      <span className="ecs-label">Links for</span>
+                      <select className="ecs-select" value={inv.leaderId} onChange={(e) => setInv({ ...inv, leaderId: e.target.value })}>
+                        <option value="">Choose a leader</option>
+                        {data.leaders.map((l) => (
+                          <option key={l.id} value={l.id}>{l.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="ecs-field" style={{ flex: "0 1 160px" }}>
+                      <span className="ecs-label">How many</span>
+                      <input
+                        className="ecs-input"
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={inv.count}
+                        disabled={!!inv.emails.trim()}
+                        onChange={(e) => setInv({ ...inv, count: Number(e.target.value) || 1 })}
+                      />
+                    </label>
+                  </div>
+                  <label className="ecs-field" style={{ marginTop: 12 }}>
+                    <span className="ecs-label">Rater emails, optional, one per line</span>
+                    <textarea
+                      className="ecs-input"
+                      rows={4}
+                      value={inv.emails}
+                      placeholder={"alex@company.com\njordan@company.com"}
+                      onChange={(e) => setInv({ ...inv, emails: e.target.value })}
+                    />
+                  </label>
+                  <label className="ecs-check">
+                    <input
+                      type="checkbox"
+                      checked={inv.send}
+                      disabled={round.status !== "open" || !inv.emails.trim()}
+                      onChange={(e) => setInv({ ...inv, send: e.target.checked })}
+                    />
+                    Email each person their link{round.status !== "open" ? " (available once the survey is open)" : ""}
+                  </label>
+                  <div style={{ marginTop: 16 }}>
+                    <button className="ecs-btn" disabled={pending || !inv.leaderId} onClick={makeLinks}>
+                      Create links
+                    </button>
+                  </div>
+                </>
+              )}
+              {links && links.length > 0 && (
+                <div className="ecs-links">
+                  <div className="ecs-row" style={{ justifyContent: "space-between", alignItems: "center" }}>
+                    <strong>
+                      {links.length} new {links.length === 1 ? "link" : "links"}
+                    </strong>
+                    <button className="ecs-btn ecs-btn--ghost" type="button" onClick={copyAll}>
+                      {copied ? "Copied" : "Copy all"}
+                    </button>
+                  </div>
+                  <p className="ecs-muted" style={{ margin: "8px 0" }}>
+                    Copy these now. For privacy, links are stored scrambled, so they can&apos;t be shown again.
+                  </p>
+                  <textarea className="ecs-input" readOnly rows={Math.min(8, links.length + 1)} value={linkText(links)} />
+                </div>
+              )}
             </div>
           </>
         )}

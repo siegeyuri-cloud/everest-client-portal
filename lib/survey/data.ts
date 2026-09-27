@@ -1,6 +1,9 @@
 import { createServiceClient } from "@/lib/supabaseService";
 
 export type Result = { ok: true } | { ok: false; error: string };
+export type LinkResult =
+  | { ok: true; links: { email: string | null; url: string }[]; emailed: number; note: string | null }
+  | { ok: false; error: string };
 export type Round = {
   id: string;
   title: string;
