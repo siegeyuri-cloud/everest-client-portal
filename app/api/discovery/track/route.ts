@@ -65,15 +65,15 @@ export async function POST(req: Request) {
     referrer: String(body?.referrer ?? "").slice(0, 500) || null,
     user_agent: (req.headers.get("user-agent") ?? "").slice(0, 300) || null,
   });
-  if (error) {
-    console.error("[discovery/track] insert failed", event, error.message);
-    return NextResponse.json({ ok: false }, { status: 500, headers });
-  }
+  // A failed save must not lose a lead. The team email and HubSpot still
+  // go out; only the dashboard misses the event. (discovery_events may not
+  // exist yet: the migration is waiting on database access.)
+  if (error) console.error("[discovery/track] insert failed", event, error.message);
 
   if (event === "book" || event === "share" || event === "complete") {
     after(() => followUp(event, detail).catch((e) => console.error("[discovery/track] follow-up threw", event, e)));
   }
-  return NextResponse.json({ ok: true }, { headers });
+  return NextResponse.json({ ok: true, stored: !error }, { headers });
 }
 
 async function followUp(event: string, d: Record<string, any>) {
