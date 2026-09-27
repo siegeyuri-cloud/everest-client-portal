@@ -119,3 +119,38 @@
 .ecs textarea.ecs-input { resize: vertical; font-family: var(--font-body); line-height: 1.5; }
 .ecs-check { display: flex; gap: var(--space-2); align-items: center; margin-top: var(--space-3); font-size: var(--fs-body-sm); color: var(--text-body); }
 .ecs-links { margin-top: var(--space-5); padding: var(--space-4); background: var(--surface-sunken); border-radius: var(--radius-sm); }
+
+.ecs-top { background: var(--surface-card); border-bottom: 1px solid var(--border-subtle); }
+.ecs-top-in { max-width: 720px; margin: 0 auto; padding: var(--space-3) clamp(16px, 4vw, 32px); display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.ecs-brand { display: inline-flex; align-items: center; gap: var(--space-2); font-family: var(--font-display); font-weight: var(--fw-bold); font-size: 1.125rem; letter-spacing: var(--ls-kicker); text-transform: uppercase; color: var(--text-strong); }
+.ecs-client { font-family: var(--font-label); font-size: var(--fs-caption); font-weight: var(--fw-bold); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--text-muted); text-align: right; }
+.ecs-narrow { max-width: 720px; margin: 0 auto; padding: var(--space-7) clamp(16px, 4vw, 32px) var(--space-9); }
+.ecs-sub { font-size: var(--fs-body-lg); color: var(--text-muted); margin: var(--space-2) 0 0; }
+.ecs-h3 { font-family: var(--font-body); font-weight: var(--fw-bold); font-size: var(--fs-body-lg); color: var(--text-strong); margin: 0 0 var(--space-2); }
+.ecs-promise { border-top: 4px solid var(--brand-primary); }
+.ecs-promise p { margin: 0; }
+.ecs-btn--lg { font-size: var(--fs-body); padding: 14px 28px; margin-top: var(--space-6); }
+.ecs-progress { position: sticky; top: 0; z-index: 10; background: rgba(240, 238, 236, 0.95); backdrop-filter: blur(6px); border-bottom: 1px solid var(--border-subtle); }
+.ecs-progress-in { max-width: 720px; margin: 0 auto; padding: var(--space-3) clamp(16px, 4vw, 32px); }
+.ecs-progress-track { height: 4px; border-radius: 2px; background: var(--border-default); overflow: hidden; margin-top: var(--space-2); }
+.ecs-progress-fill { height: 100%; background: var(--brand-primary); transition: width 300ms ease; }
+.ecs-qgroup { margin-top: var(--space-7); }
+.ecs-q { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-5); margin-top: var(--space-4); scroll-margin-top: 90px; }
+.ecs-q--missing { border-color: var(--brand-secondary); box-shadow: 0 0 0 3px var(--ec-basecamp-25); }
+.ecs-qlabel { margin: 0; font-size: var(--fs-caption); font-weight: var(--fw-semibold); letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--text-muted); }
+.ecs-qtext { margin: var(--space-1) 0 var(--space-4); font-size: var(--fs-body-lg); font-weight: var(--fw-semibold); color: var(--text-strong); line-height: 1.35; }
+.ecs-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-2); }
+.ecs-opt { font: inherit; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: var(--space-3) var(--space-2); min-height: 72px; background: var(--surface-page); border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: var(--text-strong); cursor: pointer; text-align: center; }
+.ecs-opt:hover { border-color: var(--brand-primary-deep); }
+.ecs-opt.is-on { background: var(--brand-primary); border-color: var(--brand-primary-deep); color: var(--text-on-action); }
+.ecs-opt-n { font-family: var(--font-display); font-weight: var(--fw-bold); font-size: 1.5rem; line-height: 1; }
+.ecs-opt-l { font-size: var(--fs-caption); line-height: 1.25; }
+.ecs-qmiss { margin: var(--space-3) 0 0; font-size: var(--fs-caption); font-weight: var(--fw-semibold); color: var(--ink-gold); }
+.ecs-submitbar { margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid var(--border-default); }
+@media (max-width: 560px) {
+  .ecs-scale { grid-template-columns: 1fr; }
+  .ecs-opt { flex-direction: row; justify-content: flex-start; gap: var(--space-3); min-height: 48px; padding: var(--space-2) var(--space-3); text-align: left; }
+  .ecs-opt-n { font-size: 1.25rem; width: 1.25rem; }
+  .ecs-opt-l { font-size: var(--fs-body-sm); }
+}
+@media (prefers-reduced-motion: reduce) { .ecs-progress-fill { transition: none; } }

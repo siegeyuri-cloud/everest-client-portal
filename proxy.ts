@@ -48,6 +48,9 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  // Rater survey links are public: the one-time invite token is the key.
+  // Only /<client>/survey itself; /survey/setup and /survey/results stay behind login.
+  if (/^\/[a-z0-9-]+\/survey\/?$/i.test(pathname)) return NextResponse.next();
   const isPublic = PUBLIC_PATHS.some(
     (p) => pathname === p || pathname.startsWith(p + "/")
   );
