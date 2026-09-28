@@ -1,6 +1,7 @@
 import { NextResponse, after } from "next/server";
 import { Resend } from "resend";
 import { createServiceClient } from "@/lib/supabaseService";
+import { renderLeadEmail } from "@/lib/discovery/lead-email";
 
 /**
  * Events from the Discovery page on everestcollective.com (a static page on
@@ -101,12 +102,14 @@ async function followUp(event: string, d: Record<string, any>) {
     if (s(d.oneThing)) rows.push(["One thing", s(d.oneThing)]);
 
     const kept = rows.filter(([, v]) => v);
-    const html = '<div style="font-family:Helvetica,Arial,sans-serif;font-size:14px;max-width:560px;color:#0f172a;">'
+    let html = '<div style="font-family:Helvetica,Arial,sans-serif;font-size:14px;max-width:560px;color:#0f172a;">'
       + '<h2 style="font-weight:500;margin:0 0 16px;">' + esc(subject) + "</h2><table>"
       + kept.map(([k, v]) => '<tr><td style="padding:6px 16px 6px 0;color:#64748b;vertical-align:top;white-space:nowrap;">'
         + esc(k) + '</td><td style="padding:6px 0;">' + esc(v) + "</td></tr>").join("")
       + "</table></div>";
     const text = kept.map(([k, v]) => k + ": " + v).join("\n");
+    // Booking alerts use the Claude Design template; other alerts keep the plain layout for now.
+    if (event === "book") html = renderLeadEmail(d).html;
     tasks.push(
       new Resend(key).emails.send({ from: FROM, to: NOTIFY, subject, html, text })
         .then((r) => { if (r.error) console.error("[discovery/track] email failed", event, r.error); }),
